@@ -4,13 +4,20 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowRight } from 'lucide-vue-next'
-const email = ref('')
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const username = ref('')
 const password = ref('')
 function handleLogin() {
   // 這裡可以加上 API 請求
+  // 模擬登入成功，寫入 token
+  alert(`帳號: ${username.value}\n密碼: ${password.value}`)
+
+  localStorage.setItem('token', username.value)
   // 如果成功，則跳轉到首頁
   // 如果失敗，則顯示錯誤訊息
-  alert(`帳號: ${email.value}\n密碼: ${password.value}`)
+  router.push('/')
 }
 </script>
 
@@ -26,7 +33,7 @@ function handleLogin() {
       <form class="space-y-6" @submit.prevent="handleLogin">
         <div class="relative max-w-sm">
           <Label class="text-md font-sans font-thin">帳號</Label>
-          <Input v-model="email" type="text" required class="w-full" />
+          <Input v-model="username" type="text" required class="w-full" />
         </div>
         <div>
           <Label class="text-md font-sans font-thin">密碼</Label>
@@ -38,7 +45,7 @@ function handleLogin() {
           class="w-full flex flex-row items-center justify-between"
         >
           <span class="text-md font-sans font-thin"> 登入 Login </span>
-          <ArrowRight class="size-4 mr-2" />
+          <ArrowRight class="siz mr-2" />
         </Button>
       </form>
     </div>

@@ -8,6 +8,8 @@ const email = ref('')
 const password = ref('')
 function handleLogin() {
   // 這裡可以加上 API 請求
+  // 如果成功，則跳轉到首頁
+  // 如果失敗，則顯示錯誤訊息
   alert(`帳號: ${email.value}\n密碼: ${password.value}`)
 }
 </script>

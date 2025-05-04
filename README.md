@@ -37,3 +37,8 @@ npm run build
 ```sh
 npm run lint
 ```
+
+## 套件使用
+
+- CSS: tailwind css v3
+- ui-component: shadcn-vue@1.0.3

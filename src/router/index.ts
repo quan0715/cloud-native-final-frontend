@@ -1,19 +1,27 @@
 import Login from '@/views/Login.vue'
-import { createRouter, createMemoryHistory } from 'vue-router'
+import Home from '@/views/Home.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/login',
     component: Login,
   },
+  {
+    path: '/',
+    component: Home,
+  },
 ]
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes,
 })
 router.beforeEach((to, from, next) => {
-  if (to.path === '/') {
+  const token = localStorage.getItem('token')
+  if (!token && to.path !== '/login') {
     next('/login')
+  } else if (token && to.path === '/login') {
+    next('/')
   } else {
     next()
   }

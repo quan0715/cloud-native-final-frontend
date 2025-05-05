@@ -22,6 +22,13 @@
           <TaskRequestList @create="onCreateRequest" :requirements="mockRequirements"  />
         </div>
 
+        <TaskRequestForm
+          :visible="showRequestForm"
+          :names="TaskNames"
+          @submit="handleNewTask"
+          @close="showRequestForm = false"
+        />
+
         <!-- task running list -->
         <TaskList :tasks="mockTasks" />
 
@@ -39,6 +46,7 @@
 
 import MachineStatusList from '@/components/Machine/MachineStatusList.vue'
 import TaskList from '@/components/Task/TaskList.vue'
+import TaskRequestForm from '@/components/Task/TaskRequestForm.vue'
 import TaskRequestList from '@/components/Task/TaskRequestList.vue'
 import TaskSummaryCard from '@/components/Task/TaskSummaryCard.vue'
 import UserAssignmentList from '@/components/User/UserAssignmentList.vue'
@@ -71,6 +79,7 @@ function handleLogout() {
 function onCreateRequest() {
   // todo: popout
   console.log('create new request')
+  showRequestForm.value = true
 }
 
 const totalTasks = computed(() => mockTasks.value.length)
@@ -80,6 +89,14 @@ const completedCount = computed(
 const pendingCount = computed(
   () => mockTasks.value.filter(t => t.status !== TaskStatus.Done).length
 )
+const TaskNames = computed(() => {
+  return mockRequirements.value.map(r => r.type)
+})
+const showRequestForm = ref(false)
+function handleNewTask(newTask: { name: string, tags: string[] }) {
+  console.log(newTask)
+  showRequestForm.value = false
+}
 
 const mockRequirements = ref([
   {

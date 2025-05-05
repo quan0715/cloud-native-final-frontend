@@ -38,6 +38,12 @@ npm run build
 npm run lint
 ```
 
+### Test
+
+```sh
+npm run test
+```
+
 ## 套件使用
 
 - CSS: tailwind css v3

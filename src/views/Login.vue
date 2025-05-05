@@ -45,7 +45,7 @@ function handleLogin() {
           class="w-full flex flex-row items-center justify-between"
         >
           <span class="text-md font-sans font-thin"> 登入 Login </span>
-          <ArrowRight class="siz mr-2" />
+          <ArrowRight class="w-5 h-5" />
         </Button>
       </form>
     </div>

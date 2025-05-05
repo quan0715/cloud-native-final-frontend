@@ -20,7 +20,7 @@ function handleLogout() {
   <div class="flex flex-col h-screen">
     <div class="flex flex-row justify-between px-10 py-4">
       <div>
-        <h1>Mini Lab Analysis Task Management</h1>
+        <h1 class="text-xl font-thin">Mini Lab Analysis Task Management (Beta Version)</h1>
       </div>
       <div class="flex flex-row items-center gap-4">
         <p>{{ username }}</p>

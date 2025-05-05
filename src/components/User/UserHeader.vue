@@ -7,32 +7,25 @@
     <Badge class="w-fit h-9" :class="badgeClass">{{ roleLabel }}</Badge>
 
     <!-- 登出按鈕 -->
-    <Button
-      class="w-fit"
-      variant="destructive"
-      @click="$emit('logout')"
-    >
-      Logout
-    </Button>
+    <Button class="w-fit" variant="destructive" @click="$emit('logout')"> Logout </Button>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { defineProps, defineEmits, computed } from 'vue'
 import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
 
 const Role = {
   MANAGER: '管理者',
-  WORKER:  '工作者',
-  ADMIN:   'admin',
+  WORKER: '工作者',
+  ADMIN: 'admin',
 }
 
 const { username, roleLabel } = defineProps({
-  username:  { type: String, required: true },
-  roleLabel: { type: String }
+  username: { type: String, required: true },
+  roleLabel: { type: String },
 })
-
 
 const badgeClass = computed(() => {
   console.log('roleLabel', roleLabel)
@@ -48,7 +41,5 @@ const badgeClass = computed(() => {
   }
 })
 
-
 const emit = defineEmits(['logout'])
 </script>
-

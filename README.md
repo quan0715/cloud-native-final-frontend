@@ -40,8 +40,15 @@ npm run lint
 
 ### Test
 
+- Unit Test
 ```sh
 npm run test
+```
+
+- E2E Test
+```sh
+npx playwright install
+npm run test:e2e
 ```
 
 ## 套件使用

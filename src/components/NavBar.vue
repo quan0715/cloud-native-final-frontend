@@ -11,12 +11,12 @@ import { useRouter } from 'vue-router'
 
 const username = localStorage.getItem('token') || ''
 
-const emit = defineEmits(['logout'])
+// const emit = defineEmits(['logout'])
 const router = useRouter()
 
 function handleLogout() {
   localStorage.removeItem('token')
   router.push('/login')
-  emit('logout')
+  // emit('logout')
 }
 </script>

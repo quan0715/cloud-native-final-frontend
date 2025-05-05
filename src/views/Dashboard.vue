@@ -1,9 +1,18 @@
 <template>
   <div class="grid grid-cols-3 gap-4 h-full">
     <!-- task dashboard -->
-    <div class="space-y-4">
-      <TaskSummaryCard :total="totalTasks" :completed="completedCount" :pending="pendingCount" />
-      <TaskRequestList @create="onCreateRequest" :requirements="mockRequirements" />
+    <div class="flex flex-col space-y-4">
+      <TaskSummaryCard
+        :total="totalTasks"
+        :completed="completedCount"
+        :pending="pendingCount"
+        class="w-full"
+      />
+      <TaskRequestList
+        @create="onCreateRequest"
+        :requirements="mockRequirements"
+        class="w-full flex-1"
+      />
     </div>
 
     <TaskRequestForm
@@ -17,9 +26,9 @@
     <TaskList :tasks="mockTasks" />
 
     <!-- status and workers list -->
-    <div class="space-y-4">
-      <MachineStatusList :machines="mockMachines" />
-      <UserAssignmentList :users="mockUsers" />
+    <div class="flex flex-col space-y-4">
+      <MachineStatusList :machines="mockMachines" class="w-full h-auto flex-1" />
+      <UserAssignmentList :users="mockUsers" class="w-full h-auto flex-1" />
     </div>
   </div>
 </template>

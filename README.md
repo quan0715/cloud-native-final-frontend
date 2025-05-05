@@ -42,3 +42,8 @@ npm run lint
 
 - CSS: tailwind css v3
 - ui-component: shadcn-vue@1.0.3
+
+## 環境
+
+- 正式機： app.quan.wtf
+- 測試機： test.quan.wtf

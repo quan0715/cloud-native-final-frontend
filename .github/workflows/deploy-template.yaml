@@ -3,15 +3,19 @@ name: Deploy Template
 on:
   workflow_call:
     inputs:
-      deploy_host:
-        required: true
-        type: string
       branch:
         required: true
         type: string
       tag:
         required: true
         type: string
+    secrets:
+      deploy_host:
+        required: true
+      ec2_user:
+        required: true
+      ec2_ssh_key:
+        required: true
 
 jobs:
   build-and-push:
@@ -51,9 +55,9 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
-          host: ${{ inputs.deploy_host }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.deploy_host }}
+          username: ${{ secrets.ec2_user }}
+          key: ${{ secrets.ec2_ssh_key }}
           script: |
             set -e
             echo "👉 拉${{ inputs.tag }}映像"

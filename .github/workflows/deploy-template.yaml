@@ -61,7 +61,5 @@ jobs:
             sudo docker compose pull
             echo "👉 重啟服務（不中斷）"
             sudo docker compose up -d --remove-orphans
-            echo "👉 清 24h 前殘餘映像"
-            sudo docker system prune -f --filter \"until=24h\"
             echo "👉 重啟 cloudflared，讓新容器立即被代理"
             sudo systemctl restart cloudflared

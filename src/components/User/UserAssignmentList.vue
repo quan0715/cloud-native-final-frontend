@@ -23,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+import DashboardCard from '@/components/DashboardCard.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import Card from '@/components/ui/card/Card.vue';
 import { UserStatus, type UserAssignment } from '@/types/user';

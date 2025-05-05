@@ -1,7 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl shadow p-4">
-    <h2 class="text-lg font-medium mb-3">機器狀態</h2>
-
+  <DashboardCard title="機器狀態">
     <ul class="space-y-3">
       <li v-for="m in machines" :key="m.id">
         <Card class="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
@@ -22,10 +20,11 @@
         </Card>
       </li>
     </ul>
-  </div>
+  </DashboardCard>
 </template>
 
 <script setup lang="ts">
+import DashboardCard from '@/components/DashboardCard.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import Card from '@/components/ui/card/Card.vue';
 import { MachineStatus, type Machine } from '@/types/machine';

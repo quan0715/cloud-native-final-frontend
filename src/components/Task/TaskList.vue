@@ -1,6 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl shadow p-4">
-    <h2 class="text-lg font-medium mb-3">任務數量</h2>
+  <DashboardCard title="任務數量">
     <ul class="space-y-3">
       <li v-for="task in tasks" :key="task.id">
         <Card class="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
@@ -14,10 +13,11 @@
         </Card>
       </li>
     </ul>
-  </div>
+  </DashboardCard>
 </template>
 
 <script setup lang="ts">
+import DashboardCard from '@/components/DashboardCard.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 import Card from '@/components/ui/card/Card.vue';
 import type { Task } from '@/types/task';

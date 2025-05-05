@@ -1,0 +1,19 @@
+name: Beta‑only merge gate
+
+on:
+  pull_request:
+    branches: [main] # 只檢查對 main 的 PR
+
+jobs:
+  beta-gate:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Check source branch
+        run: |
+          echo "PR from: ${{ github.head_ref }}"
+          if [[ "${{ github.head_ref }}" != "beta" ]]; then
+            echo "::error::❌ 只能從 beta 分支合併到 main！"
+            exit 1
+          fi
+          echo "✅ 來源正確，允許合併。"

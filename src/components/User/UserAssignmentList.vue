@@ -1,6 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl shadow p-4">
-    <h2 class="text-lg font-medium mb-3">人員清單</h2>
+  <DashboardCard title="人員清單">
     <ul class="space-y-3">
       <li v-for="u in users" :key="u.id">
         <Card class="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
@@ -20,7 +19,7 @@
         </Card>
       </li>
     </ul>
-  </div>
+  </DashboardCard>
 </template>
 
 <script setup lang="ts">

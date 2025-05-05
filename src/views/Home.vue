@@ -1,21 +1,8 @@
-
-
 <template>
   <div class="flex flex-col h-screen">
-    <!-- Header -->
-    <div class="flex items-center justify-between px-10 py-4 border-b">
-      <h1 class="text-2xl font-semibold">Mini Lab Analysis Task Management</h1>
-      <UserHeader
-        :username="username"
-        role-label="管理者"
-        @logout="handleLogout"
-      />
-    </div>
-    <h2 class="px-10 py-4 border-b text-3xl">組長儀錶板/</h2>
-
     <!-- Main Content（Grid）-->
-    <div class="flex-1 overflow-auto p-6">
-      <div class="grid grid-cols-3 gap-6 h-full">
+    <div class="flex-1 overflow-auto p-6 bg-gray-100">
+      <div class="grid grid-cols-3 gap-4 h-full">
         <!-- task dashboard -->
         <div class="space-y-6">
           <TaskSummaryCard :total="totalTasks" :completed="completedCount" :pending="pendingCount"  />
@@ -43,14 +30,12 @@
 </template>
 
 <script setup lang="ts">
-
 import MachineStatusList from '@/components/Machine/MachineStatusList.vue'
 import TaskList from '@/components/Task/TaskList.vue'
 import TaskRequestForm from '@/components/Task/TaskRequestForm.vue'
 import TaskRequestList from '@/components/Task/TaskRequestList.vue'
 import TaskSummaryCard from '@/components/Task/TaskSummaryCard.vue'
 import UserAssignmentList from '@/components/User/UserAssignmentList.vue'
-import UserHeader from '@/components/User/UserHeader.vue'
 // Value import for component and enum
 import { MachineStatus } from '@/types/machine'
 import { TaskStatus } from '@/types/task'
@@ -135,4 +120,3 @@ const mockMachines = ref([
   { id: 2, name: 'Machine2', code: 'M2', status: MachineStatus.Idle }
 ])
 </script>
-

@@ -33,9 +33,6 @@ jobs:
           platforms: linux/amd64, linux/arm64
           tags: ghcr.io/${{ github.repository }}:latest
 
-      - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest

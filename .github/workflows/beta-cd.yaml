@@ -8,8 +8,10 @@ on:
 jobs:
   call-deploy:
     uses: ./.github/workflows/deploy-template.yaml
-
     with:
-      deploy_host: ${{ secrets.TEST_EC2_HOST }}
       branch: beta
       tag: beta
+    secrets:
+      deploy_host: ${{ secrets.TEST_EC2_HOST }}
+      ec2_user: ${{ secrets.EC2_USER }}
+      ec2_ssh_key: ${{ secrets.EC2_SSH_KEY }}

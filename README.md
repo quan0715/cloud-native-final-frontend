@@ -47,7 +47,6 @@ npm run test
 
 - E2E Test
 ```sh
-npx playwright install
 npm run test:e2e
 ```
 

@@ -2,10 +2,10 @@
   <DropdownMenu>
     <DropdownMenuTrigger
       ><div
-        class="flex items-center justify-center gap-4 rounded-full bg-gray-100 px-4 py-2"
+        class="flex items-center justify-center gap-4 rounded-full bg-gray-100 hover:bg-gray-200 px-4 py-2"
         :class="badgeClass"
       >
-        <Avatar>
+        <Avatar class="w-7 h-7">
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>

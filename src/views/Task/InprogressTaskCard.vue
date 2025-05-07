@@ -9,7 +9,7 @@
         </div>
         <p
           class="text-2xl text-sans font-semibold text-gray-600"
-          ass="text-sm text-sans font-semibold text-gray-600"
+          class="text-sm text-sans font-semibold text-gray-600"
         >
           {{ inprogressTask.taskName }}
         </p>

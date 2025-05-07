@@ -8,7 +8,7 @@
       <UserHeader
         :username="username"
         lab-name="lab11"
-        role-label="管理者"
+        :role-label="roleLabel"
         @logout="handleLogout"
       />
     </div>
@@ -18,8 +18,11 @@
 <script setup lang="ts">
 import UserHeader from '@/components/User/UserHeader.vue'
 import { useRouter } from 'vue-router'
-
-const username = localStorage.getItem('token') || ''
+import { jwtDecode } from 'jwt-decode'
+const token = localStorage.getItem('token') || ''
+const decodedToken = jwtDecode(token) as { id: string; role: string }
+const username = decodedToken.id
+const roleLabel = decodedToken.role
 
 // const emit = defineEmits(['logout'])
 const router = useRouter()

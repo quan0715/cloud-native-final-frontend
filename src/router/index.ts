@@ -1,5 +1,5 @@
 import MainLayout from '@/layouts/MainLayout.vue'
-import Dashboard from '@/views/Dashboard.vue'
+import DashboardView from '@/views/DashboardView.vue'
 import Task from '@/views/Task/Task.vue'
 import Admin from '@/views/Admin.vue'
 import Login from '@/views/Login.vue'
@@ -16,7 +16,7 @@ const routes = [
     children: [
       {
         path: 'dashboard',
-        component: Dashboard,
+        component: DashboardView,
         meta: {
           title: '任務儀錶板',
         },

@@ -41,9 +41,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 const Role = {
-  MANAGER: '管理者',
-  WORKER: '工作者',
-  ADMIN: '管理員',
+  MANAGER: 'leader',
+  WORKER: 'worker',
+  ADMIN: 'admin',
 }
 
 const { username, roleLabel, labName } = defineProps({

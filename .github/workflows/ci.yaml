@@ -2,7 +2,6 @@ name: Frontend CI
 
 on:
   push: # 觸發時機：推送到任何分支
-  pull_request: # 觸發時機：建立到任何分支的 Pull Request
 
 jobs:
   build-and-test:
@@ -11,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x] # 你可以指定想要測試的 Node.js 版本
+        node-version: [20.x] # 你可以指定想要測試的 Node.js 版本
 
     steps:
       - name: Checkout repository

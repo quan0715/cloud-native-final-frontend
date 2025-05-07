@@ -27,7 +27,7 @@ function handleLogin() {
     style="background-image: url('/images/login-bg.png')"
   >
     <div
-      class="w-full max-w-md bg-white bg-opacity-85 backdrop-blur-md shadow-2xl p-10 flex flex-col justify-center min-h-screen"
+      class="w-full max-w-md bg-white bg-opacity-80 backdrop-blur-sm shadow-2xl p-10 flex flex-col justify-center min-h-screen"
     >
       <h2 class="text-3xl font-sans font-thin mb-8 text-left">Mini Lab 任務管理平台</h2>
       <form class="space-y-6" @submit.prevent="handleLogin">

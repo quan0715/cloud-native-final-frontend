@@ -18,3 +18,12 @@ export interface TaskRequirement {
   type: string
   tags: string[]
 }
+
+export interface InprogressTask {
+  id: number
+  taskCode: string
+  taskName: string
+  user: string
+  machine: string[]
+  startTime: Date
+}

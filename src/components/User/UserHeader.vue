@@ -2,7 +2,7 @@
   <DropdownMenu>
     <DropdownMenuTrigger
       ><div
-        class="flex items-center justify-center gap-4 rounded-full bg-gray-100 hover:bg-gray-200 px-4 py-2"
+        class="flex items-center justify-center gap-2 rounded-full bg-gray-100 hover:bg-gray-200 px-4 py-1"
         :class="badgeClass"
       >
         <Avatar class="w-7 h-7">
@@ -11,7 +11,7 @@
         </Avatar>
 
         <!-- 顯示使用者名稱 -->
-        <p class="text-md font-normal text-gray-800">{{ username }}</p>
+        <p class="text-md font-normal text-gray-800">{{ labName }}@{{ username }}</p>
 
         <!-- 身份 Badge -->
         <div class="rounded-full px-4 py-1 bg-gray-100">
@@ -46,9 +46,10 @@ const Role = {
   ADMIN: '管理員',
 }
 
-const { username, roleLabel } = defineProps({
+const { username, roleLabel, labName } = defineProps({
   username: { type: String, required: true },
   roleLabel: { type: String },
+  labName: { type: String, required: true },
 })
 
 const badgeClass = computed(() => {

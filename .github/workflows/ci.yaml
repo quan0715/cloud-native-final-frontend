@@ -32,7 +32,7 @@ jobs:
 
       - name: Run unit tests
         run:
-          npm run test:unit
+          npm run test
             
       - name: Build project
         run: npm run build # 執行打包指令，假設你的 package.json 有 "build" 指令

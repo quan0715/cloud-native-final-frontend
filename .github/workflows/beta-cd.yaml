@@ -19,4 +19,4 @@ jobs:
       deploy_host: ${{ secrets.TEST_EC2_HOST }}
       ec2_user: ${{ secrets.EC2_USER }}
       ec2_ssh_key: ${{ secrets.EC2_SSH_KEY }}
-      vite_api_base_url: ${{ vars.VITE_API_BASE_URL }}
+      vite_api_base_url: ${{ secrets.VITE_API_BASE_URL }}

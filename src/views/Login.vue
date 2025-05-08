@@ -10,7 +10,8 @@ const username = ref('')
 const password = ref('')
 async function handleLogin() {
   try {
-    const response = await fetch('/api/auth/login', {
+    console.log('api url', import.meta.env.VITE_API_BASE_URL)
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

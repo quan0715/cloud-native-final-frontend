@@ -1,7 +1,10 @@
 name: Frontend CI
 
 on:
-  push: # 觸發時機：推送到任何分支
+  push:
+    branches-ignore:
+      - 'main'
+      - 'beta'
 
 jobs:
   build-and-test:

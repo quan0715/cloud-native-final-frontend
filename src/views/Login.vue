@@ -5,19 +5,36 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowRight } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
-
 const router = useRouter()
 const username = ref('')
 const password = ref('')
-function handleLogin() {
-  // 這裡可以加上 API 請求
-  // 模擬登入成功，寫入 token
-  alert(`帳號: ${username.value}\n密碼: ${password.value}`)
+async function handleLogin() {
+  try {
+    console.log('api url', import.meta.env.VITE_API_BASE_URL)
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: username.value, // 使用者輸入的帳號
+        password: password.value, // 使用者輸入的密碼
+      }),
+    })
 
-  localStorage.setItem('token', username.value)
-  // 如果成功，則跳轉到首頁
-  // 如果失敗，則顯示錯誤訊息
-  router.push('/')
+    const data = await response.json() // 解析 API 回應
+
+    if (response.ok) {
+      const token = data.token
+      localStorage.setItem('token', token) // 儲存 token
+      router.push('/') // 導向到首頁 (通常是 Dashboard)
+    } else {
+      alert(data.message || '登入失敗，請檢查帳號或密碼。')
+    }
+  } catch (error) {
+    console.error('登入時發生錯誤:', error)
+    alert('登入請求失敗，請稍後再試或檢查網路連線。')
+  }
 }
 </script>
 

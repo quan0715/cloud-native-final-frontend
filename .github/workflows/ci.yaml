@@ -45,6 +45,9 @@ jobs:
       - name: Wait for server to be ready
         run: npx wait-on http://localhost:5173
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
       - name: Run E2E tests with Playwright
         run: npx playwright test
 

@@ -37,8 +37,14 @@ jobs:
       - name: Build project
         run: npm run build # 執行打包指令，假設你的 package.json 有 "build" 指令
 
-      - name: Run E2E Tests with Playwright
-        with:
-          start: npm run dev   # 啟動開發伺服器的指令
-          wait-on: 'http://localhost:5173' # 等待開發伺服器啟動的路徑和端口
+      - name: Start dev server
+        run: npm run dev &
+        env:
+          CI: true
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:5173
+
+      - name: Run E2E tests with Playwright
         run: npx playwright test
+

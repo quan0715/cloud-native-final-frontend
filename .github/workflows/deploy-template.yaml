@@ -16,6 +16,8 @@ on:
         required: true
       ec2_ssh_key:
         required: true
+      vite_api_base_url:
+        required: true
 
 jobs:
   build-and-push:
@@ -41,6 +43,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.vite_api_base_url }}
           push: true
           platforms: ${{ matrix.platform }}
           tags: ghcr.io/${{ github.repository }}:${{ inputs.tag }}

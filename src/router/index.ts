@@ -1,4 +1,7 @@
-import Home from '@/views/Home.vue'
+import MainLayout from '@/layouts/MainLayout.vue'
+import DashboardView from '@/views/DashboardView.vue'
+import Task from '@/views/Task/Task.vue'
+import Admin from '@/views/Admin.vue'
 import Login from '@/views/Login.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
@@ -8,8 +11,32 @@ const routes = [
   },
   {
     path: '/',
-    component: Home,
-  }
+    redirect: '/dashboard',
+    component: MainLayout,
+    children: [
+      {
+        path: 'dashboard',
+        component: DashboardView,
+        meta: {
+          title: '任務儀錶板',
+        },
+      },
+      {
+        path: 'task',
+        component: Task,
+        meta: {
+          title: '個人任務管理',
+        },
+      },
+      {
+        path: 'admin',
+        component: Admin,
+        meta: {
+          title: '管理員儀錶板',
+        },
+      },
+    ],
+  },
 ]
 
 const router = createRouter({
@@ -21,7 +48,7 @@ router.beforeEach((to, from, next) => {
   if (!token && to.path !== '/login') {
     next('/login')
   } else if (token && to.path === '/login') {
-    next('/')
+    next('/dashboard')
   } else {
     next()
   }

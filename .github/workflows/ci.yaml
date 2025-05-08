@@ -1,0 +1,44 @@
+name: Frontend CI
+
+on:
+  push: # 觸發時機：推送到任何分支
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest # 在最新的 Ubuntu 環境中執行
+
+    strategy:
+      matrix:
+        node-version: [20.x] # 你可以指定想要測試的 Node.js 版本
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # 拉取程式碼
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4 # 設定 Node.js 環境
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm' # 快取 npm 依賴，加速後續執行
+
+      - name: Install dependencies
+        run:
+          npm ci # 安裝依賴，建議使用 npm ci 以確保一致性 (需要 package-lock.json)
+          # 如果沒有 package-lock.json，可以使用 npm install
+
+      #   - name: Run linters
+      #     run: npm run lint # 執行程式碼風格檢查，假設你的 package.json 有 "lint" 指令
+
+      - name: Run unit tests
+        run:
+          npm run test:unit
+            
+      - name: Build project
+        run: npm run build # 執行打包指令，假設你的 package.json 有 "build" 指令
+
+      - name: Run E2E Tests with Playwright
+        with:
+          start: npm run dev   # 啟動開發伺服器的指令
+          wait-on: 'http://localhost:5173' # 等待開發伺服器啟動的路徑和端口
+        run: npx playwright test

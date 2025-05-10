@@ -14,6 +14,7 @@ jobs:
     with:
       branch: main
       tag: latest
+      env_tag: public
     secrets:
       deploy_host: ${{ secrets.EC2_HOST }}
       ec2_user: ${{ secrets.EC2_USER }}

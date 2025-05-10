@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const username = ref('')
 const password = ref('')
+const envTag = import.meta.env.VITE_ENV_TAG
 async function handleLogin() {
   try {
     console.log('api url', import.meta.env.VITE_API_BASE_URL)
@@ -46,6 +47,7 @@ async function handleLogin() {
     <div
       class="w-full max-w-md bg-white bg-opacity-80 backdrop-blur-sm shadow-2xl p-10 flex flex-col justify-center min-h-screen"
     >
+      <span class="text-md font-sans font-thin"> {{ envTag }} version </span>
       <h2 class="text-3xl font-sans font-thin mb-8 text-left">Mini Lab 任務管理平台</h2>
       <form class="space-y-6" @submit.prevent="handleLogin">
         <div class="relative max-w-sm">

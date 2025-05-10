@@ -27,6 +27,6 @@ test.describe('Login Page', () => {
     await page.locator('input[type="password"]').fill('correctpass')
     await page.getByRole('button', { name: /登入/i }).click()
 
-    await expect(page).toHaveURL(/\/$/)
+    await expect(page).toHaveURL(/\/dashboard$/)
   })
 })

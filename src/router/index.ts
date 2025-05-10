@@ -67,7 +67,8 @@ function isValidRoute(route: string, userRole: string) {
   const userRoutes = userLabelWithRoutesMapping[userRole as keyof typeof userLabelWithRoutesMapping]
   return userRoutes.includes(route)
 }
-function getUserDefaultRoute(userRole: string) {
+
+export function getUserDefaultRoute(userRole: string) {
   return userLabelWithRoutesMapping[userRole as keyof typeof userLabelWithRoutesMapping][0]
 }
 

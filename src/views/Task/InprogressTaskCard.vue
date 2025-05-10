@@ -7,7 +7,7 @@
             inprogressTask.taskCode
           }}</span>
         </div>
-        <p class="text-sm text-sans font-semibold text-gray-600">
+        <p class="text-xl text-sans font-semibold text-gray-600">
           {{ inprogressTask.taskName }}
         </p>
       </div>

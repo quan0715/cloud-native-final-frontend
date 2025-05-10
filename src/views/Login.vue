@@ -3,14 +3,22 @@ import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowRight } from 'lucide-vue-next'
+import { ArrowRight, Loader2 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
+import { useToast } from '@/components/ui/toast/use-toast'
+
 const router = useRouter()
 const username = ref('')
 const password = ref('')
+const envTag = import.meta.env.VITE_ENV_TAG
+const { toast } = useToast()
+const isLogin = ref(false)
+
 async function handleLogin() {
   try {
-    const response = await fetch('/api/auth/login', {
+    console.log('api url', import.meta.env.VITE_API_BASE_URL)
+    isLogin.value = true
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,11 +36,18 @@ async function handleLogin() {
       localStorage.setItem('token', token) // 儲存 token
       router.push('/') // 導向到首頁 (通常是 Dashboard)
     } else {
-      alert(data.message || '登入失敗，請檢查帳號或密碼。')
+      toast({
+        title: '登入失敗',
+        description: data.message || '登入失敗，請稍後再試或檢查網路連線。',
+      })
     }
   } catch (error) {
     console.error('登入時發生錯誤:', error)
-    alert('登入請求失敗，請稍後再試或檢查網路連線。')
+    toast({
+      title: '登入請求失敗，請檢查Server是否正常運行',
+    })
+  } finally {
+    isLogin.value = false
   }
 }
 </script>
@@ -45,6 +60,7 @@ async function handleLogin() {
     <div
       class="w-full max-w-md bg-white bg-opacity-80 backdrop-blur-sm shadow-2xl p-10 flex flex-col justify-center min-h-screen"
     >
+      <span class="text-md font-sans font-thin"> {{ envTag }} version </span>
       <h2 class="text-3xl font-sans font-thin mb-8 text-left">Mini Lab 任務管理平台</h2>
       <form class="space-y-6" @submit.prevent="handleLogin">
         <div class="relative max-w-sm">
@@ -56,12 +72,14 @@ async function handleLogin() {
           <Input v-model="password" type="password" required class="w-full" />
         </div>
         <Button
+          :disabled="isLogin"
           variant="default"
           type="submit"
           class="w-full flex flex-row items-center justify-between"
         >
           <span class="text-md font-sans font-thin"> 登入 Login </span>
-          <ArrowRight class="w-5 h-5" />
+          <Loader2 v-if="isLogin" class="w-5 h-5 animate-spin" />
+          <ArrowRight v-else class="w-5 h-5" />
         </Button>
       </form>
     </div>

@@ -5,6 +5,9 @@ import Admin from '@/views/Admin.vue'
 import Login from '@/views/Login.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { jwtDecode } from 'jwt-decode'
+import { useToast } from '@/components/ui/toast/use-toast'
+
+const { toast } = useToast()
 
 interface DecodedToken {
   id: string
@@ -52,93 +55,78 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+const publicRoutes = ['/login']
 
-  // 1. 如果目標是登入頁
-  if (to.path === '/login') {
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token) as DecodedToken
-        if (decodedToken.exp < Date.now() / 1000) {
-          localStorage.removeItem('token')
-          next()
-        } else {
-          if (decodedToken.role === 'admin') next('/admin')
-          else if (decodedToken.role === 'leader') next('/dashboard')
-          else if (decodedToken.role === 'worker') next('/task')
-          else next('/dashboard') // 其他未知角色預設到 dashboard
-        }
-      } catch (error) {
-        console.error('解析登入中Token時發生錯誤:', error)
-        localStorage.removeItem('token')
-        next()
-      }
-    } else {
+const userLabelWithRoutesMapping = {
+  admin: ['/admin'],
+  leader: ['/dashboard'],
+  worker: ['/task'],
+}
+
+function isValidRoute(route: string, userRole: string) {
+  const userRoutes = userLabelWithRoutesMapping[userRole as keyof typeof userLabelWithRoutesMapping]
+  return userRoutes.includes(route)
+}
+function getUserDefaultRoute(userRole: string) {
+  return userLabelWithRoutesMapping[userRole as keyof typeof userLabelWithRoutesMapping][0]
+}
+
+router.beforeEach((to, from, next) => {
+  console.log('to', to)
+  console.log('from', from)
+  const token = localStorage.getItem('token')
+  const isLoginRoute = to.path === '/login'
+
+  if (!token) {
+    if (isLoginRoute) {
       next()
+    } else {
+      toast({
+        title: '請先登入',
+        description: '請先登入',
+      })
+      next('/login')
     }
     return
   }
-
-  // 2. 如果沒有 token (未登入) 且目標不是登入頁
-  if (!token) {
+  const decodedToken = jwtDecode(token) as DecodedToken
+  // 檢查 Token 是否過期
+  if (decodedToken.exp < Date.now() / 1000) {
+    localStorage.removeItem('token')
+    toast({
+      title: '連線階段已過期，請重新登入。',
+      description: '連線階段已過期，請重新登入。',
+    })
     next('/login')
     return
   }
+  const userRole = decodedToken.role
+  if (to.path === '/') {
+    next(getUserDefaultRoute(userRole))
+    return
+  }
+  if (publicRoutes.includes(to.path)) {
+    // 您已經登入了，進入對應的頁面
+    toast({
+      title: '您已經登入了，進入對應的頁面',
+      description: `route setting ${from.path} -> ${to.path}`,
+    })
 
-  // 3. 有 token，進行解析和權限驗證
-  try {
-    const decodedToken = jwtDecode(token) as DecodedToken
-    const userRole = decodedToken.role
-
-    if (decodedToken.exp < Date.now() / 1000) {
-      localStorage.removeItem('token')
-      alert('連線階段已過期，請重新登入。')
-      next('/login')
+    const userDefaultRoute = getUserDefaultRoute(userRole)
+    next(userDefaultRoute)
+    return
+  } else {
+    if (isValidRoute(to.path, userRole)) {
+      next()
+      return
+    } else {
+      toast({
+        title: '您沒有權限訪問此頁面。',
+        description: `role: ${userRole} route setting ${from.path} -> ${to.path}`,
+      })
+      next(getUserDefaultRoute(userRole))
       return
     }
-
-    // 檢查是否是從登入頁來的，用於設定預設跳轉
-    const fromLogin = from.path === '/login'
-
-    switch (userRole) {
-      case 'admin':
-        if (fromLogin && (to.path === '/' || to.path === '/dashboard' || to.path === '/task')) {
-          next('/admin')
-        } else {
-          next()
-        }
-        break
-      case 'leader':
-        if (to.path === '/admin') {
-          alert('您沒有權限訪問此頁面。')
-          next(fromLogin ? '/dashboard' : from.fullPath) // 從登入來就去預設，否則停在原地或預設
-        } else if (fromLogin && (to.path === '/' || to.path === '/task')) {
-          next('/dashboard')
-        } else {
-          next()
-        }
-        break
-      case 'worker':
-        if (to.path === '/admin' || to.path === '/dashboard') {
-          alert('您沒有權限訪問此頁面。')
-          next(fromLogin ? '/task' : from.fullPath) // 從登入來就去預設，否則停在原地或預設
-        } else if (fromLogin && to.path === '/') {
-          next('/task')
-        } else {
-          next()
-        }
-        break
-      default: // 未知角色或無特定規則的角色
-        alert('未知的用戶角色，將導向預設頁面。')
-        localStorage.removeItem('token') // 清除 token，因為角色未知
-        next('/login')
-    }
-  } catch (error) {
-    console.error('驗證路由權限時解析Token失敗:', error)
-    localStorage.removeItem('token')
-    alert('無效的登入憑證，請重新登入。')
-    next('/login')
   }
 })
 

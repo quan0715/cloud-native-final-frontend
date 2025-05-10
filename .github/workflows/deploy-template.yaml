@@ -9,6 +9,9 @@ on:
       tag:
         required: true
         type: string
+      env_tag:
+        required: true
+        type: string
     secrets:
       deploy_host:
         required: true
@@ -45,6 +48,7 @@ jobs:
           context: .
           build-args: |
             VITE_API_BASE_URL=${{ secrets.vite_api_base_url }}
+            VITE_ENV_TAG=${{ inputs.env_tag }}
           push: true
           platforms: ${{ matrix.platform }}
           tags: ghcr.io/${{ github.repository }}:${{ inputs.tag }}

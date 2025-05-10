@@ -15,6 +15,7 @@ jobs:
     with:
       branch: beta
       tag: beta
+      env_tag: beta
     secrets:
       deploy_host: ${{ secrets.TEST_EC2_HOST }}
       ec2_user: ${{ secrets.EC2_USER }}

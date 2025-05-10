@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label'
 import { ArrowRight, Loader2 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/components/ui/toast/use-toast'
-
+import { getUserDefaultRoute } from '@/router'
+import { jwtDecode } from 'jwt-decode'
 const router = useRouter()
 const username = ref('')
 const password = ref('')
@@ -33,8 +34,10 @@ async function handleLogin() {
 
     if (response.ok) {
       const token = data.token
-      localStorage.setItem('token', token) // 儲存 token
-      router.push('/') // 導向到首頁 (通常是 Dashboard)
+      localStorage.setItem('token', token)
+      const decodedToken = jwtDecode(token) as { id: string; role: string }
+      const userRole = decodedToken.role
+      router.push(getUserDefaultRoute(userRole))
     } else {
       toast({
         title: '登入失敗',

@@ -6,27 +6,54 @@ test.describe('Login Page', () => {
   })
 
   test('renders login form', async ({ page }) => {
-    await expect(page.locator('input[type="text"]')).toBeVisible()
-    await expect(page.locator('input[type="password"]')).toBeVisible()
+    const accountInput = page.locator('label:has-text("帳號")').locator('..').locator('input')
+    const passwordInput = page.locator('label:has-text("密碼")').locator('..').locator('input')
+
+    await expect(accountInput).toBeVisible()
+    await expect(passwordInput).toBeVisible()
     await expect(page.getByRole('button', { name: /登入/i })).toBeVisible()
   })
 
-  test('fails with invalid credentials', async ({ page }) => {
-    await page.locator('input[type="text"]').fill('wronguser')
-    await page.locator('input[type="password"]').fill('wrongpass')
+  test('fails with invalid credentials and shows toast', async ({ page }) => {
+    const accountInput = page.locator('label:has-text("帳號")').locator('..').locator('input')
+    const passwordInput = page.locator('label:has-text("密碼")').locator('..').locator('input')
+
+    await accountInput.fill('wronguser')
+    await passwordInput.fill('wrongpass')
     await page.getByRole('button', { name: /登入/i }).click()
 
-    page.on('dialog', async (dialog) => {
-      expect(dialog.message()).toContain('帳號: wronguser')
-      await dialog.dismiss()
-    })
+    const toast = page.locator('li[role="alert"][title="登入失敗"]')
+    await expect(toast).toBeVisible()
+
+    await expect(page).toHaveURL('/login')
   })
 
-  test('redirects on successful login', async ({ page }) => {
-    await page.locator('input[type="text"]').fill('admin@example.com')
-    await page.locator('input[type="password"]').fill('correctpass')
+  test('succeeds with valid credentials and redirects', async ({ page }) => {
+    const accountInput = page.locator('label:has-text("帳號")').locator('..').locator('input')
+    const passwordInput = page.locator('label:has-text("密碼")').locator('..').locator('input')
+
+    await accountInput.fill('admin001')
+    await passwordInput.fill('123456')
     await page.getByRole('button', { name: /登入/i }).click()
 
-    await expect(page).toHaveURL(/\/$/)
+    await expect(page).toHaveURL(/\/(admin|dashboard|task)$/)
   })
+
+  test('logs out after login and redirects to login page', async ({ page }) => {
+  const accountInput = page.locator('label:has-text("帳號")').locator('..').locator('input')
+  const passwordInput = page.locator('label:has-text("密碼")').locator('..').locator('input')
+
+  await accountInput.fill('admin001')
+  await passwordInput.fill('123456')
+  await page.getByRole('button', { name: /登入/i }).click()
+  await expect(page).toHaveURL('/admin')
+
+  await page.getByText('lab11@admin001', { exact: true }).click()
+  await page.getByRole('menuitem', { name: '登出' }).click()
+
+  await expect(page).toHaveURL('/login')
+
+  const token = await page.evaluate(() => localStorage.getItem('token'))
+  expect(token).toBeNull()
+})
 })

@@ -33,21 +33,24 @@ jobs:
       #   - name: Run linters
       #     run: npm run lint # 執行程式碼風格檢查，假設你的 package.json 有 "lint" 指令
 
-      #   - name: Run unit tests
-      #     run:
-      #       npm run test:unit # 執行單元測試，假設你的 package.json 有 "test:unit" 指令
-      #       # 或者可能是 npm test，視你的設定而定
-
+      - name: Run unit tests
+        run:
+          npm run test
+            
       - name: Build project
         run: npm run build # 執行打包指令，假設你的 package.json 有 "build" 指令
 
-      # 未來 E2E 測試的預留位置
-      - name: E2E Tests (Placeholder)
-        run: echo "E2E tests will be added here in the future."
-        # 例如，如果你使用 Cypress：
-        # - name: Run E2E Tests with Cypress
-        #   uses: cypress-io/github-action@v6
-        #   with:
-        #     build: npm run build # 如果 E2E 測試需要先打包
-        #     start: npm run dev   # 啟動開發伺服器的指令
-        #     wait-on: 'http://localhost:5173' # 等待開發伺服器啟動的路徑和端口
+      - name: Start dev server
+        run: npm run dev &
+        env:
+          CI: true
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:5173
+
+      - name: Install Playwright browsers
+        run: npx playwright install
+
+      - name: Run E2E tests with Playwright
+        run: npm run test:e2e
+

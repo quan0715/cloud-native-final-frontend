@@ -4,51 +4,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowRight, Loader2 } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
-import { useToast } from '@/components/ui/toast/use-toast'
+import { useLogin } from '@/composables/useLogin'
 
-const router = useRouter()
 const username = ref('')
 const password = ref('')
 const envTag = import.meta.env.VITE_ENV_TAG
-const { toast } = useToast()
-const isLogin = ref(false)
+const { login, isLogin } = useLogin()
 
 async function handleLogin() {
-  try {
-    console.log('api url', import.meta.env.VITE_API_BASE_URL)
-    isLogin.value = true
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: username.value, // 使用者輸入的帳號
-        password: password.value, // 使用者輸入的密碼
-      }),
-    })
-
-    const data = await response.json() // 解析 API 回應
-
-    if (response.ok) {
-      const token = data.token
-      localStorage.setItem('token', token) // 儲存 token
-      router.push('/') // 導向到首頁 (通常是 Dashboard)
-    } else {
-      toast({
-        title: '登入失敗',
-        description: data.message || '登入失敗，請稍後再試或檢查網路連線。',
-      })
-    }
-  } catch (error) {
-    console.error('登入時發生錯誤:', error)
-    toast({
-      title: '登入請求失敗，請檢查Server是否正常運行',
-    })
-  } finally {
-    isLogin.value = false
-  }
+  await login({
+    id: username.value,
+    password: password.value,
+  })
 }
 </script>
 

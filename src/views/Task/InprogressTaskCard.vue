@@ -7,7 +7,7 @@
             inprogressTask.taskCode
           }}</span>
         </div>
-        <p class="text-sm text-sans font-semibold text-gray-600">
+        <p class="text-xl text-sans font-semibold text-gray-600">
           {{ inprogressTask.taskName }}
         </p>
       </div>
@@ -55,7 +55,7 @@ const getInprogressTask = (): InprogressTask | undefined => {
     taskName: 'XD12334131',
     user: 'QUAN',
     machine: ['Machine1', 'Machine2', 'Machine3'],
-    startTime: new Date('2025-05-07 20:00:00'),
+    startTime: new Date('2025-05-09 20:00:00'),
   }
 }
 

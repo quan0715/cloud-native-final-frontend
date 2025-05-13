@@ -9,12 +9,17 @@ on:
       tag:
         required: true
         type: string
+      env_tag:
+        required: true
+        type: string
     secrets:
       deploy_host:
         required: true
       ec2_user:
         required: true
       ec2_ssh_key:
+        required: true
+      vite_api_base_url:
         required: true
 
 jobs:
@@ -41,6 +46,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.vite_api_base_url }}
+            VITE_ENV_TAG=${{ inputs.env_tag }}
           push: true
           platforms: ${{ matrix.platform }}
           tags: ghcr.io/${{ github.repository }}:${{ inputs.tag }}
@@ -61,5 +69,7 @@ jobs:
             sudo docker compose pull
             echo "👉 重啟服務（不中斷）"
             sudo docker compose up -d --remove-orphans
+            echo "🔄 Pruning Docker images"
+            sudo docker image prune -af
             echo "👉 重啟 cloudflared，讓新容器立即被代理"
             sudo systemctl restart cloudflared

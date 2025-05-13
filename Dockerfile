@@ -4,7 +4,16 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --frozen-lockfile
 COPY . .
-RUN npm run build
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+RUN echo "VITE_API_BASE_URL: $VITE_API_BASE_URL"
+
+ARG VITE_ENV_TAG
+ENV VITE_ENV_TAG=$VITE_ENV_TAG
+RUN echo "VITE_ENV_TAG: $VITE_ENV_TAG"
+
+RUN npm install
+RUN VITE_API_BASE_URL=$VITE_API_BASE_URL VITE_ENV_TAG=$VITE_ENV_TAG npm run build
 
 # production stage
 FROM nginx:stable-alpine as production-stage

@@ -3,21 +3,19 @@ import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowRight } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
+import { ArrowRight, Loader2 } from 'lucide-vue-next'
+import { useLogin } from '@/composables/useLogin'
 
-const router = useRouter()
 const username = ref('')
 const password = ref('')
-function handleLogin() {
-  // 這裡可以加上 API 請求
-  // 模擬登入成功，寫入 token
-  alert(`帳號: ${username.value}\n密碼: ${password.value}`)
+const envTag = import.meta.env.VITE_ENV_TAG
+const { login, isLogin } = useLogin()
 
-  localStorage.setItem('token', username.value)
-  // 如果成功，則跳轉到首頁
-  // 如果失敗，則顯示錯誤訊息
-  router.push('/')
+async function handleLogin() {
+  await login({
+    id: username.value,
+    password: password.value,
+  })
 }
 </script>
 
@@ -29,6 +27,7 @@ function handleLogin() {
     <div
       class="w-full max-w-md bg-white bg-opacity-80 backdrop-blur-sm shadow-2xl p-10 flex flex-col justify-center min-h-screen"
     >
+      <span class="text-md font-sans font-thin"> {{ envTag }} version </span>
       <h2 class="text-3xl font-sans font-thin mb-8 text-left">Mini Lab 任務管理平台</h2>
       <form class="space-y-6" @submit.prevent="handleLogin">
         <div class="relative max-w-sm">
@@ -40,12 +39,14 @@ function handleLogin() {
           <Input v-model="password" type="password" required class="w-full" />
         </div>
         <Button
+          :disabled="isLogin"
           variant="default"
           type="submit"
           class="w-full flex flex-row items-center justify-between"
         >
           <span class="text-md font-sans font-thin"> 登入 Login </span>
-          <ArrowRight class="w-5 h-5" />
+          <Loader2 v-if="isLogin" class="w-5 h-5 animate-spin" />
+          <ArrowRight v-else class="w-5 h-5" />
         </Button>
       </form>
     </div>

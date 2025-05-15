@@ -48,7 +48,7 @@ test.describe('Login Page', () => {
   await page.getByRole('button', { name: /登入/i }).click()
   await expect(page).toHaveURL('/admin')
 
-  await page.getByText('lab11@admin001', { exact: true }).click()
+  await page.locator('button[aria-haspopup="menu"]').click()
   await page.getByRole('menuitem', { name: '登出' }).click()
 
   await expect(page).toHaveURL('/login')

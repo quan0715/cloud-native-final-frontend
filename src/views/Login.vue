@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowRight, Loader2 } from 'lucide-vue-next'
 import { useLogin } from '@/composables/useLogin'
+import { ArrowRight, Loader2 } from 'lucide-vue-next'
+import { ref } from 'vue'
 
 const username = ref('')
 const password = ref('')
@@ -13,7 +13,7 @@ const { login, isLogin } = useLogin()
 
 async function handleLogin() {
   await login({
-    id: username.value,
+    userName: username.value,
     password: password.value,
   })
 }

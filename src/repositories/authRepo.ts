@@ -2,7 +2,7 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL
 const authEndPoint = `${baseUrl}/auth`
 
 export interface LoginRequest {
-  id: string
+  userName: string
   password: string
 }
 

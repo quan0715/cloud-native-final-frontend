@@ -1,12 +1,12 @@
-import { login as loginApi } from '@/repositories/authRepo'
 import { useToast } from '@/components/ui/toast/use-toast'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { login as loginApi } from '@/repositories/authRepo'
 import { getUserDefaultRoute } from '@/router'
 import { jwtDecode } from 'jwt-decode'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 type LoginRequest = {
-  id: string
+  userName: string
   password: string
 }
 

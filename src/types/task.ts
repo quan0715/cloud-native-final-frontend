@@ -36,3 +36,15 @@ export interface Task {
   updatedAt: ISODate
   __v?: number
 }
+
+
+export interface InprogressTask {
+  _id: ObjectId
+  taskTypeId: TaskType        // 後端直接帶 TaskType 物件
+  taskName: string            // ex: 電性測試-001
+  assigner_id: ObjectId | null
+  taskData: TaskData
+  createdAt: ISODate
+  updatedAt: ISODate
+  __v?: number
+}

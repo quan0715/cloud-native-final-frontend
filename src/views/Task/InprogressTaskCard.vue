@@ -43,23 +43,33 @@
 <script setup lang="ts">
 import DashboardCard from '@/components/DashboardCard.vue'
 import DashboardData from '@/components/DashboardData.vue'
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import type { InprogressTask } from '@/types/task'
-import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-// mock fetching data from repo
-const getInprogressTask = (): InprogressTask | undefined => {
-  return {
-    id: 1,
-    taskCode: '溫度測試',
-    taskName: 'XD12334131',
-    user: 'QUAN',
-    machine: ['Machine1', 'Machine2', 'Machine3'],
-    startTime: new Date('2025-05-09 20:00:00'),
-  }
-}
+import { Separator } from '@/components/ui/separator'
+// import type { InprogressTask } from '@/types/task'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-const inprogressTask = ref<InprogressTask | undefined>(getInprogressTask())
+// TODO: add proper type for tasks, add api on it
+
+// mock fetching data from repo
+// const getInprogressTask = (): InprogressTask | undefined => {
+//   return {
+//     id: 1,
+//     taskCode: '溫度測試',
+//     taskName: 'XD12334131',
+//     user: 'QUAN',
+//     machine: ['Machine1', 'Machine2', 'Machine3'],
+//     startTime: new Date('2025-05-09 20:00:00'),
+//   }
+// }
+
+// const inprogressTask = ref<InprogressTask | undefined>(getInprogressTask())
+
+const inprogressTask = ref<{
+  taskCode: string
+  taskName: string
+  machine: string[]
+  startTime: Date
+} | null>(null)
 
 const startTime = ref(inprogressTask.value?.startTime ?? new Date())
 const now = ref(new Date())

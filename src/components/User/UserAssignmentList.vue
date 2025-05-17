@@ -1,21 +1,21 @@
 <template>
   <DashboardCard title="人員清單">
     <ul class="space-y-3">
-      <li v-for="u in users" :key="u.id">
+      <li v-for="u in userAssignmentList" :key="u._id">
         <Card class="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
           <div>
-            <p class="font-semibold">{{ u.name }}</p>
-            <p v-if="u.status === UserStatus.Working" class="text-xs text-gray-500">
-              正在進行 {{ u.task }}
+            <p class="font-semibold">{{ u.userName }}</p>
+            <p v-if="u.inProgressTasks.length > 0" class="text-xs text-gray-500">
+              正在進行 {{ u.inProgressTasks }}
             </p>
-            <p v-else-if="u.status === UserStatus.Idle" class="text-xs text-gray-500">
+            <p v-else-if="u.inProgressTasks.length == 0" class="text-xs text-gray-500">
               空閒中
             </p>
-            <p v-else-if="u.status === UserStatus.Assigned" class="text-xs text-gray-500">
-              已指派任務 {{ u.task }}
+            <p v-else-if="u.assignedTasks.length > 0" class="text-xs text-gray-500">
+              已指派任務 {{ u.assignedTasks }}
             </p>
           </div>
-          <Badge :class="statusClass(u.status)">{{ u.status }}</Badge>
+          <Badge :class="statusClass(userStatus(u))" class="text-xs">{{ userStatus(u) }}</Badge>
         </Card>
       </li>
     </ul>
@@ -24,12 +24,20 @@
 
 <script setup lang="ts">
 import DashboardCard from '@/components/DashboardCard.vue';
-import Badge from '@/components/ui/badge/Badge.vue';
 import Card from '@/components/ui/card/Card.vue';
-import { UserStatus, type UserAssignment } from '@/types/user';
+import { UserStatus, type UserWithTasks } from '@/types/user';
 
-const props = defineProps<{ users: UserAssignment[] }>()
-const users = props.users
+const { userAssignmentList } = defineProps<{ userAssignmentList: UserWithTasks[] }>()
+
+const userStatus = function(user: UserWithTasks) {
+  if (user.inProgressTasks.length > 0) {
+    return UserStatus.Working
+  } else if (user.assignedTasks.length > 0) {
+    return UserStatus.Assigned
+  } else {
+    return UserStatus.Idle
+  }
+}
 
 function statusClass(status: string) {
   switch (status) {

@@ -33,6 +33,11 @@ jobs:
       #   - name: Run linters
       #     run: npm run lint # 執行程式碼風格檢查，假設你的 package.json 有 "lint" 指令
 
+      - name: Inject .env for Playwright
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
+          echo "VITE_ENV_TAG=ci" >> .env
+
       - name: Run unit tests
         run:
           npm run test

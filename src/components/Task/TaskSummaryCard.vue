@@ -19,8 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
 import DashboardCard from '@/components/DashboardCard.vue'
+import { defineProps } from 'vue'
 
 interface Props {
   total: number
@@ -28,6 +28,6 @@ interface Props {
   pending: number
 }
 
-const props = defineProps<Props>()
-const { total, completed, pending } = props
+
+const { total, completed, pending } = defineProps<Props>()
 </script>

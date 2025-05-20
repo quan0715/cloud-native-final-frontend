@@ -6,7 +6,7 @@
           class="flex flex-row items-stretch gap-4 border-2 border-gray-200 p-4 rounded-xl"
         >
           <!-- 任務基本資訊 -->
-          <div class="flex flex-col gap-1 min-w-32">
+          <div class="flex flex-col gap-1 min-w-48">
             <p class="text-sm text-gray-500">ID: {{ task._id }}</p>
             <p class="text-xl font-semibold">{{ task.taskName }}</p>
           </div>
@@ -15,8 +15,8 @@
 
           <!-- 所需機台數 -->
           <DashboardData
-            title="標籤"
-            :content="task.task_types.toString()"
+            title="所需機台數"
+            :content="task.number_of_machine.toString()"
           />
 
           <Separator orientation="vertical" class="h-auto" />
@@ -38,27 +38,11 @@ import DashboardCard from '@/components/DashboardCard.vue'
 import DashboardData from '@/components/DashboardData.vue'
 import Button from '@/components/ui/button/Button.vue'
 import { Separator } from '@/components/ui/separator'
+import type { TaskType } from '@/types/task'
 import { Edit } from 'lucide-vue-next'
-import { ref } from 'vue'
 
+const { taskTypes } = defineProps<{ taskTypes: TaskType[] }>()
 
+console.log('TaskTypeManageTab props:', taskTypes)
 
-/* mock 資料：之後替換成 API */
-const taskTypes = ref([
-  {
-    _id: 'machine1',
-    taskName: '電性測試',
-    task_types: ['tt2'],
-  },
-  {
-    _id: 'machine2',
-    taskName: '物性測試',
-    task_types: ['tt1'],
-  },
-  {
-    _id: 'machine3',
-    taskName: '溫度測試',
-    task_types: ['tt3'],
-  },
-])
 </script>

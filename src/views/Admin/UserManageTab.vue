@@ -38,12 +38,7 @@ import { Separator } from '@/components/ui/separator'
 import { UserRole, type User } from '@/types/user'
 import { Edit } from 'lucide-vue-next'
 
-// defineProps({
-//   users: {
-//     type: Array as () => User[],
-//     required: true,
-//   },
-// })
+
 const { users } = defineProps<{ users: User[] }>()
 console.log('UserManageTab props:', users)
 </script>

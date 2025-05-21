@@ -12,7 +12,7 @@
             <TabsTrigger value="任務類型管理" :class="tabTriggerClass"> 任務類型管理 </TabsTrigger>
           </TabsList>
           <TabsContent value="使用者管理"> <UserManageTab :users="users" /> </TabsContent>
-          <TabsContent value="機器管理"> <MachineManageTab :machines="machines" /> </TabsContent>
+          <TabsContent value="機器管理"> <MachineManageTab :machines="machines" :taskTypes="taskTypes" @delete="handleMachineDelete" @update="handleMachineUpdate" /> </TabsContent>
           <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" /> </TabsContent>
           <Separator />
         </Tabs>
@@ -102,4 +102,35 @@ async function fetchTaskTypes() {
 fetchUsers()
 fetchMachines()
 fetchTaskTypes()
+
+const handleMachineDelete = async (id: string) => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/machines/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchMachines()
+    console.log('deleted machine:', id)
+  }
+}
+const handleMachineUpdate = async (payload: { _id: string; machineName: string; taskIds: string[] }) => {
+  console.log(payload)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/machines/${payload._id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      machineName: payload.machineName,
+      machine_task_types : payload.taskIds,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchMachines()
+    console.log('updated machine:', payload)
+  }
+}
+
 </script>

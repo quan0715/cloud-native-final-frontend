@@ -13,7 +13,7 @@
           </TabsList>
           <TabsContent value="使用者管理"> <UserManageTab :users="users" /> </TabsContent>
           <TabsContent value="機器管理"> <MachineManageTab :machines="machines" :taskTypes="taskTypes" @delete="handleMachineDelete" @update="handleMachineUpdate" /> </TabsContent>
-          <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" /> </TabsContent>
+          <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" @update="handleTaskTypeUpdate" @delete="handleTaskTypeDelete" /> </TabsContent>
           <Separator />
         </Tabs>
       </DashboardCard>
@@ -130,6 +130,37 @@ const handleMachineUpdate = async (payload: { _id: string; machineName: string; 
   else {
     await fetchMachines()
     console.log('updated machine:', payload)
+  }
+}
+
+const handleTaskTypeDelete = async (id: string) => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/task-types/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchTaskTypes()
+    console.log('deleted task type:', id)
+  }
+}
+
+const handleTaskTypeUpdate = async (payload: { _id: string; taskName: string; number_of_machine: number }) => {
+  console.log(payload)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/task-types/${payload._id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      taskName: payload.taskName,
+      number_of_machine: payload.number_of_machine,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchTaskTypes()
+    console.log('updated task type:', payload)
   }
 }
 

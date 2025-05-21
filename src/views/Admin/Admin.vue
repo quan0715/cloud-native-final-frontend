@@ -11,7 +11,7 @@
             <TabsTrigger value="機器管理" :class="tabTriggerClass"> 機器管理 </TabsTrigger>
             <TabsTrigger value="任務類型管理" :class="tabTriggerClass"> 任務類型管理 </TabsTrigger>
           </TabsList>
-          <TabsContent value="使用者管理"> <UserManageTab :users="users" /> </TabsContent>
+          <TabsContent value="使用者管理"> <UserManageTab :users="users" :taskTypes="taskTypes" @update="handleUserUpdate" @delete="handleUserDelete"   /> </TabsContent>
           <TabsContent value="機器管理"> <MachineManageTab :machines="machines" :taskTypes="taskTypes" @delete="handleMachineDelete" @update="handleMachineUpdate" /> </TabsContent>
           <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" @update="handleTaskTypeUpdate" @delete="handleTaskTypeDelete" /> </TabsContent>
           <Separator />
@@ -164,4 +164,47 @@ const handleTaskTypeUpdate = async (payload: { _id: string; taskName: string; nu
   }
 }
 
+const handleUserDelete = async (id: string) => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/users/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchUsers()
+    console.log('deleted user:', id)
+  }
+}
+const handleUserUpdate = async (payload: { _id: string; userName: string; userRole: string; taskIds: string[] }) => {
+  console.log(payload)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/users/${payload._id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userName: payload.userName,
+      userRole: payload.userRole,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    console.log('updated user:', payload)
+  }
+  fetchUsers()
+  for (let i = 0; i < payload.taskIds.length; i++) {
+    const res1 = await fetch(`${base}/users/${payload._id}/add-task-type`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        taskTypeId: payload.taskIds[i],
+      }),
+    })
+    if (!res1.ok) throw new Error(`HTTP ${res1.status}`)
+    else {
+      console.log('updated user:', payload)
+    }
+  }
+  fetchUsers()
+}
 </script>

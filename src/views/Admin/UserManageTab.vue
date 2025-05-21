@@ -177,6 +177,7 @@ function resetEdit() {
 }
 
 function toggleTask(id: string) {
+  console.log('toggleTask', id)
   if (editTaskIds.value.includes(id)) {
     editTaskIds.value = editTaskIds.value.filter((t) => t !== id)
   } else {

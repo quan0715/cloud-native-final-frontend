@@ -176,10 +176,16 @@ const handleUserDelete = async (id: string) => {
     console.log('deleted user:', id)
   }
 }
-const handleUserUpdate = async (payload: { _id: string; userName: string; userRole: string; taskIds: string[] }) => {
-  console.log(payload)
+const handleUserUpdate = async (payload: {
+  _id: string
+  userName: string
+  userRole: string
+  taskIds: string[]
+}) => {
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/users/${payload._id}`, {
+
+  /* ---------- 1. 先更新使用者基本資料 ---------- */
+  const res = await fetch(`${base}/users/${payload._id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -188,23 +194,39 @@ const handleUserUpdate = async (payload: { _id: string; userName: string; userRo
     }),
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  else {
-    console.log('updated user:', payload)
-  }
-  fetchUsers()
-  for (let i = 0; i < payload.taskIds.length; i++) {
-    const res1 = await fetch(`${base}/users/${payload._id}/add-task-type`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        taskTypeId: payload.taskIds[i],
+
+  /* ---------- 2. 取舊的任務 id 陣列 ---------- */
+  const userOld = users.value.find((u) => u._id === payload._id)
+  const taskIdsOld = userOld ? userOld.user_task_types.map((t) => t._id) : []
+
+  /* ---------- 3. 比較差集 ---------- */
+  const toAdd    = payload.taskIds.filter((id) => !taskIdsOld.includes(id))
+  const toRemove = taskIdsOld.filter((id) => !payload.taskIds.includes(id))
+
+  /* ---------- 4. 新增任務類型 ---------- */
+  await Promise.all(
+    toAdd.map((taskId) =>
+      fetch(`${base}/users/${payload._id}/add-task-type`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskTypeId: taskId }),
       }),
-    })
-    if (!res1.ok) throw new Error(`HTTP ${res1.status}`)
-    else {
-      console.log('updated user:', payload)
-    }
-  }
-  fetchUsers()
+    ),
+  )
+
+  /* ---------- 5. 移除任務類型 ---------- */
+  await Promise.all(
+    toRemove.map((taskId) =>
+      fetch(`${base}/users/${payload._id}/remove-task-type`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskTypeId: taskId }),
+      }),
+    ),
+  )
+
+  /* ---------- 6. 重新抓最新資料 ---------- */
+  await fetchUsers()
 }
+
 </script>

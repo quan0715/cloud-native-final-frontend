@@ -4,18 +4,18 @@
       <h3 class="text-lg font-medium mb-4">新增任務</h3>
       <form @submit.prevent="submitForm" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1">任務名稱</label>
+          <label class="block text-sm font-medium mb-1">任務項目</label>
           <select v-model="selectedName" class="w-full border rounded px-2 py-1">
-            <option disabled value="">請選擇任務名稱</option>
+            <option disabled value="">請選擇任務項目</option>
             <option v-for="n in names" :key="n" :value="n">{{ n }}</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1">任務 Tag (逗號分隔)</label>
+          <label class="block text-sm font-medium mb-1">輸入任務名稱</label>
           <input
             v-model="tagsInput"
             type="text"
-            placeholder="例如: 專案1,專案2"
+            placeholder="輸入任務名稱"
             class="w-full border rounded px-2 py-1"
           />
         </div>
@@ -46,8 +46,7 @@ watch(() => props.visible, (val) => {
 })
 
 function submitForm() {
-  const tags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t)
-  emit('submit', { name: selectedName.value, tags })
+  emit('submit', { name: selectedName.value, tagsInput: tagsInput.value })
   close()
 }
 

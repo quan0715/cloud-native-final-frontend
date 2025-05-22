@@ -9,8 +9,8 @@
         class="w-full"
       />
       <TaskRequestList
-        @create="onCreateRequest"
-        :requirements="mockRequirements"
+        @create="onCreateTaskType"
+        :taskTypes="taskTypes"
         class="w-full flex-1"
       />
     </div>
@@ -21,42 +21,60 @@
       @submit="handleNewTask"
       @close="showRequestForm = false"
     />
+    <MachineRequestForm
+      :visible="showMachineRequestForm"
+      :names="TaskNames"
+      @submit="handleNewMachine"
+      @close="showMachineRequestForm = false"
+    />
+    <TaskTypeRequestForm
+      :visible="showTaskTypeForm"
+      @submit="handleNewTaskType"
+      @close="showTaskTypeForm = false"
+    />
 
     <!-- task running list -->
-    <TaskList :tasks="mockTasks" />
+    <TaskList :tasks="tasks" @create="onCreateRequest" class="w-full h-auto flex-1" />
 
     <!-- status and workers list -->
     <div class="flex flex-col space-y-4">
-      <MachineStatusList :machines="mockMachines" class="w-full h-auto flex-1" />
-      <UserAssignmentList :users="mockUsers" class="w-full h-auto flex-1" />
+      <MachineStatusList :machines="machines" class="w-full h-auto flex-1" @create="onCreateMachine" />
+      <UserAssignmentList :userAssignmentList="userAssignmentList" class="w-full h-auto flex-1" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import MachineRequestForm from '@/components/Machine/MachineRequestForm.vue'
 import MachineStatusList from '@/components/Machine/MachineStatusList.vue'
 import TaskList from '@/components/Task/TaskList.vue'
 import TaskRequestForm from '@/components/Task/TaskRequestForm.vue'
 import TaskRequestList from '@/components/Task/TaskRequestList.vue'
 import TaskSummaryCard from '@/components/Task/TaskSummaryCard.vue'
+import TaskTypeRequestForm from '@/components/Task/TaskTypeRequestForm.vue'
 import UserAssignmentList from '@/components/User/UserAssignmentList.vue'
 // Value import for component and enum
-import { MachineStatus } from '@/types/machine'
-import { TaskStatus } from '@/types/task'
-import { UserStatus } from '@/types/user'
-
-// Type-only imports
-import type { Task } from '@/types/task'
-import { type UserAssignment } from '@/types/user'
-
-import { computed, ref } from 'vue'
+import type { Machine } from '@/types/machine'
+import type { Task, TaskType } from '@/types/task'
+import type { User, UserWithTasks } from '@/types/user'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
+const users  = ref<User[]>([])
+const machines = ref<Machine[]>([])
+const taskTypes = ref<TaskType[]>([])
+const userAssignmentList = ref<UserWithTasks[]>([])
+const tasks = ref<Task[]>([])
 
 const username = localStorage.getItem('token')
 if (!username) {
   router.push('/login')
 }
+
+const showRequestForm = ref(false)
+const showMachineRequestForm = ref(false)
+const showTaskTypeForm = ref(false)
 
 function onCreateRequest() {
   // todo: popout
@@ -64,75 +82,200 @@ function onCreateRequest() {
   showRequestForm.value = true
 }
 
-const totalTasks = computed(() => mockTasks.value.length)
-const completedCount = computed(
-  () => mockTasks.value.filter((t) => t.status === TaskStatus.Done).length,
-)
-const pendingCount = computed(
-  () => mockTasks.value.filter((t) => t.status !== TaskStatus.Done).length,
-)
-const TaskNames = computed(() => {
-  return mockRequirements.value.map((r) => r.type)
-})
-const showRequestForm = ref(false)
-function handleNewTask(newTask: { name: string; tags: string[] }) {
-  console.log(newTask)
-  showRequestForm.value = false
+function onCreateMachine() {
+  // todo: popout
+  showMachineRequestForm.value = true
+  console.log('create new machine')
+}
+function onCreateTaskType() {
+  // todo: popout
+  showTaskTypeForm.value = true
+  console.log('create new task type')
 }
 
-const mockRequirements = ref([
-  {
-    id: 1,
-    code: 'XD12345',
-    type: '溫度測試',
-    tags: ['專案1', '專案2'],
-  },
-  {
-    id: 2,
-    code: 'XD23456',
-    type: '電性測試',
-    tags: ['專案3'],
-  },
-  {
-    id: 3,
-    code: 'XD34567',
-    type: '物性測試',
-    tags: ['專案1', '專案4'],
-  },
-])
+const totalTasks = computed(() => tasks.value.length)
 
-const mockTasks = ref<Task[]>([
-  {
-    id: 1,
-    code: 'XD12345',
-    name: '溫度測試',
-    user: 'User1',
-    machine: 'Machine1',
-    status: TaskStatus.InProgress,
-  },
-  {
-    id: 2,
-    code: 'XD23456',
-    name: '電性測試',
-    user: 'User2',
-    machine: 'Machine2',
-    status: TaskStatus.Done,
-  },
-])
-const mockUsers = ref<UserAssignment[]>([
-  { id: 1, name: 'User1', status: UserStatus.Working, task: 'XD12345' },
-  { id: 2, name: 'User2', status: UserStatus.Idle },
-  { id: 3, name: 'User3', status: UserStatus.Idle },
-  { id: 4, name: 'User4', status: UserStatus.Assigned, task: 'XD23456' },
-])
-const mockMachines = ref([
-  {
-    id: 1,
-    name: 'Machine1',
-    code: 'M1',
-    status: MachineStatus.Working,
-    currentTask: { id: 1, code: 'XD12345', name: '溫度測試' },
-  },
-  { id: 2, name: 'Machine2', code: 'M2', status: MachineStatus.Idle },
-])
+const completedCount = computed(
+  () => tasks.value.filter((t: Task) => t.taskData.state == 'success').length,
+)
+const pendingCount = computed(
+  () => tasks.value.filter((t: Task) => t.taskData.state !== 'assigned').length,
+)
+const TaskNames = computed(() => {
+  return taskTypes.value.map((t) => t.taskName)
+})
+
+async function handleNewTask(newTask: { name: string; tagsInput: string }) {
+  console.log(newTask.tagsInput)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/tasks`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      taskTypeId: taskTypes.value.find((t) => t.taskName === newTask.name)?._id,
+      taskName: newTask.tagsInput,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    const task = (await res.json()) as Task
+    tasks.value.push(task)
+    console.log('new task:', task)
+  }
+
+  showRequestForm.value = false
+}
+async function handleNewMachine(newMachine: { machine_task_types: string[]; machineName: string }) {
+  console.log(newMachine)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/machines`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      machineName: newMachine.machineName,
+      machine_task_types: newMachine.machine_task_types,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    const machine = (await res.json()) as Machine
+    await fetchMachines()
+    console.log('new machine:', machine)
+  }
+
+  showMachineRequestForm.value = false
+}
+async function handleNewTaskType(payload: { taskName: string; number_of_machine: number }) {
+  console.log(payload)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res = await fetch(`${base}/task-types`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      taskName: payload.taskName,
+      number_of_machine: payload.number_of_machine,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    const taskType = (await res.json()) as TaskType
+    await fetchTaskTypes()
+    console.log('new task type:', taskType)
+  }
+
+  showTaskTypeForm.value = false
+}
+
+const loading = ref(false)
+const error   = ref<string | null>(null)
+async function fetchUsers() {
+  loading.value = true
+  error.value   = null
+
+  try {
+    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
+    const res  = await fetch(`${base}/users`, {                         // 若後端要帶 cookie
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    users.value = (await res.json()) as User[]
+  } catch (e: any) {
+    error.value = e.message ?? 'Unknown error'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function fetchMachines() {
+  loading.value = true
+  error.value   = null
+  try {
+    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
+    const res  = await fetch(`${base}/machines`, {                         // 若後端要帶 cookie
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    machines.value = (await res.json()) as Machine[]
+  } catch (e: any) {
+    error.value = e.message ?? 'Unknown error'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function fetchTaskTypes() {
+  loading.value = true
+  error.value   = null
+  try {
+    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
+    const res  = await fetch(`${base}/task-types`, {                         // 若後端要帶 cookie
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    taskTypes.value = (await res.json()) as TaskType[]
+  } catch (e: any) {
+    error.value = e.message ?? 'Unknown error'
+  } finally {
+    loading.value = false
+  }
+}
+async function fetchTasks() {
+  loading.value = true
+  error.value   = null
+  try {
+    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
+    const res  = await fetch(`${base}/tasks`, {                         // 若後端要帶 cookie
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    tasks.value = (await res.json()) as Task[]
+  } catch (e: any) {
+    error.value = e.message ?? 'Unknown error'
+  } finally {
+    loading.value = false
+  }
+}
+async function fetchUserAssignmentList() {
+  loading.value = true
+  error.value   = null
+  try {
+    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
+    const res  = await fetch(`${base}/users/with-tasks`, {                         // 若後端要帶 cookie
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    userAssignmentList.value = (await res.json()) as UserWithTasks[]
+  } catch (e: any) {
+    error.value = e.message ?? 'Unknown error'
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+onMounted(async () => {
+  loading.value = true
+  error.value = null
+  try {
+    await Promise.all([
+      fetchUsers(),
+      fetchMachines(),
+      fetchTaskTypes(),
+      fetchTasks(),
+      fetchUserAssignmentList(),
+    ])
+  } catch (e: any) {
+    error.value = e.message ?? 'Unknown error'
+  } finally {
+    loading.value = false
+  }
+  console.log('fetch users:', users.value)
+  console.log('fetch machines:', machines.value)
+  console.log('fetch task types:', taskTypes.value)
+  console.log('fetch tasks:', tasks.value)
+  console.log('fetch user assignment list:', userAssignmentList.value)
+})
+
+
 </script>

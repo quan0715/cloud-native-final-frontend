@@ -1,25 +1,25 @@
 <template>
   <DashboardCard title="進行中任務">
-    <div v-if="inprogressTask">
-      <div class="flex flex-col justify-start items-start gap-2 p-2">
+    <div v-if="inprogressTask && inprogressTask.length > 0">
+      <div v-for="task in inprogressTask" class="flex flex-col justify-start items-start gap-2 p-2">
         <div class="px-2 py-1 bg-purple-50 rounded-xl">
           <span class="text-sm text-sans font-semibold text-purple-600">{{
-            inprogressTask.taskCode
+            task._id
           }}</span>
         </div>
         <p class="text-xl text-sans font-semibold text-gray-600">
-          {{ inprogressTask.taskName }}
+          {{ task.taskName }}
         </p>
       </div>
       <Separator class="w-full my-2" />
-      <div class="grid grid-cols-3 gap-2">
+      <div v-for="task in inprogressTask" class="grid grid-cols-3 gap-2">
         <div
-          v-for="(machine, idx) in inprogressTask.machine"
-          :key="machine"
+          v-for="(machine, idx) in task.machine"
+          :key="idx"
           class="col-span-1 flex flex-row justify-start items-start gap-2"
         >
-          <DashboardData title="佔用機器" :content="machine" />
-          <Separator orientation="vertical" v-if="idx !== inprogressTask.machine.length - 1" />
+          <DashboardData title="佔用機器" :content="machine.machineName" />
+          <Separator orientation="vertical" v-if="task.machine && idx !== task.machine.length - 1" />
         </div>
       </div>
       <Separator class="w-full my-2" />
@@ -43,25 +43,25 @@
 <script setup lang="ts">
 import DashboardCard from '@/components/DashboardCard.vue'
 import DashboardData from '@/components/DashboardData.vue'
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import type { InprogressTask } from '@/types/task'
-import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-// mock fetching data from repo
-const getInprogressTask = (): InprogressTask | undefined => {
-  return {
-    id: 1,
-    taskCode: '溫度測試',
-    taskName: 'XD12334131',
-    user: 'QUAN',
-    machine: ['Machine1', 'Machine2', 'Machine3'],
-    startTime: new Date('2025-05-09 20:00:00'),
-  }
-}
+import { Separator } from '@/components/ui/separator'
+import type { TaskSnapshot } from '@/types/user'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-const inprogressTask = ref<InprogressTask | undefined>(getInprogressTask())
+// TODO: add proper type for tasks, add api on it
 
-const startTime = ref(inprogressTask.value?.startTime ?? new Date())
+const { inprogressTask } = defineProps<{ inprogressTask: TaskSnapshot[] }>()
+console.log('InprogressTaskCard props:', inprogressTask)
+
+// const inprogressTask = ref<{
+//   taskCode: string
+//   taskName: string
+//   machine: string[]
+//   startTime: Date
+// } | null>(null)
+
+// const startTime = ref(inprogressTask.value?.startTime ?? new Date())
+const startTime = ref(new Date())
 const now = ref(new Date())
 
 let timer: number | undefined

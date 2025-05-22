@@ -3,8 +3,8 @@
     <div class="flex-1 justify-center flex flex-col items-center">
       <DashboardData title="本週指派進度" content="100%">
         <h1 class="text-4xl text-sans font-thin">
-          <span class="text-blue-500 font-semibold">11</span>
-          <span class="text-gray-500">/ 39</span>
+          <span class="text-blue-500 font-semibold"> {{ completed }} </span>
+          <span class="text-gray-500">/ {{ total }} </span>
         </h1>
       </DashboardData>
     </div>
@@ -27,4 +27,16 @@
 import DashboardCard from '@/components/DashboardCard.vue'
 import DashboardData from '@/components/DashboardData.vue'
 import { Separator } from '@/components/ui/separator'
+
+import { defineProps } from 'vue'
+const { total, completed } = defineProps({
+  total: {
+    type: Number,
+    default: 0,
+  },
+  completed: {
+    type: Number,
+    default: 0,
+  },
+})
 </script>

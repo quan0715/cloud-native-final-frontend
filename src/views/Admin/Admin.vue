@@ -11,9 +11,9 @@
             <TabsTrigger value="機器管理" :class="tabTriggerClass"> 機器管理 </TabsTrigger>
             <TabsTrigger value="任務類型管理" :class="tabTriggerClass"> 任務類型管理 </TabsTrigger>
           </TabsList>
-          <TabsContent value="使用者管理"> <UserManageTab :users="users" /> </TabsContent>
-          <TabsContent value="機器管理"> <MachineManageTab :machines="machines" /> </TabsContent>
-          <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" /> </TabsContent>
+          <TabsContent value="使用者管理"> <UserManageTab :users="users" :taskTypes="taskTypes" @update="handleUserUpdate" @delete="handleUserDelete"   /> </TabsContent>
+          <TabsContent value="機器管理"> <MachineManageTab :machines="machines" :taskTypes="taskTypes" @delete="handleMachineDelete" @update="handleMachineUpdate" /> </TabsContent>
+          <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" @update="handleTaskTypeUpdate" @delete="handleTaskTypeDelete" /> </TabsContent>
           <Separator />
         </Tabs>
       </DashboardCard>
@@ -102,4 +102,131 @@ async function fetchTaskTypes() {
 fetchUsers()
 fetchMachines()
 fetchTaskTypes()
+
+const handleMachineDelete = async (id: string) => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/machines/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchMachines()
+    console.log('deleted machine:', id)
+  }
+}
+const handleMachineUpdate = async (payload: { _id: string; machineName: string; taskIds: string[] }) => {
+  console.log(payload)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/machines/${payload._id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      machineName: payload.machineName,
+      machine_task_types : payload.taskIds,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchMachines()
+    console.log('updated machine:', payload)
+  }
+}
+
+const handleTaskTypeDelete = async (id: string) => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/task-types/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchTaskTypes()
+    console.log('deleted task type:', id)
+  }
+}
+
+const handleTaskTypeUpdate = async (payload: { _id: string; taskName: string; number_of_machine: number }) => {
+  console.log(payload)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/task-types/${payload._id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      taskName: payload.taskName,
+      number_of_machine: payload.number_of_machine,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchTaskTypes()
+    console.log('updated task type:', payload)
+  }
+}
+
+const handleUserDelete = async (id: string) => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/users/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    await fetchUsers()
+    console.log('deleted user:', id)
+  }
+}
+const handleUserUpdate = async (payload: {
+  _id: string
+  userName: string
+  userRole: string
+  taskIds: string[]
+}) => {
+  const base = import.meta.env.VITE_API_BASE_URL
+
+  /* ---------- 1. 先更新使用者基本資料 ---------- */
+  const res = await fetch(`${base}/users/${payload._id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userName: payload.userName,
+      userRole: payload.userRole,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+  /* ---------- 2. 取舊的任務 id 陣列 ---------- */
+  const userOld = users.value.find((u) => u._id === payload._id)
+  const taskIdsOld = userOld ? userOld.user_task_types.map((t) => t._id) : []
+
+  /* ---------- 3. 比較差集 ---------- */
+  const toAdd    = payload.taskIds.filter((id) => !taskIdsOld.includes(id))
+  const toRemove = taskIdsOld.filter((id) => !payload.taskIds.includes(id))
+
+  /* ---------- 4. 新增任務類型 ---------- */
+  await Promise.all(
+    toAdd.map((taskId) =>
+      fetch(`${base}/users/${payload._id}/add-task-type`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskTypeId: taskId }),
+      }),
+    ),
+  )
+
+  /* ---------- 5. 移除任務類型 ---------- */
+  await Promise.all(
+    toRemove.map((taskId) =>
+      fetch(`${base}/users/${payload._id}/remove-task-type`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskTypeId: taskId }),
+      }),
+    ),
+  )
+
+  /* ---------- 6. 重新抓最新資料 ---------- */
+  await fetchUsers()
+}
+
 </script>

@@ -1,13 +1,5 @@
 <template>
   <DashboardCard title="任務數量">
-    <!-- 右上角「新增任務」按鈕 -->
-    <template #action>
-      <Button @click="$emit('create')" variant="outline">
-        <div class="flex items-center gap-2">
-          <Plus class="w-4 h-4" /> 新增任務
-        </div>
-      </Button>
-    </template>
 
     <!-- 列表 -->
     <ul class="space-y-3">
@@ -43,10 +35,8 @@
 <script setup lang="ts">
 import DashboardCard from '@/components/DashboardCard.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
-import Button from '@/components/ui/button/Button.vue';
 import Card from '@/components/ui/card/Card.vue';
 import type { Task } from '@/types/task';
-import { Plus } from 'lucide-vue-next';
 import { defineProps } from 'vue';
 
 

@@ -1,13 +1,5 @@
 <template>
   <DashboardCard title="機器狀態">
-    <template #action>
-      <Button @click="$emit('create')" variant="outline">
-        <div class="flex items-center gap-2">
-          <Plus class="w-4 h-4" />
-          新增機器
-        </div>
-      </Button>
-    </template>
     <ul class="space-y-3">
       <li v-for="m in machines" :key="m._id">
         <Card class="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
@@ -35,10 +27,8 @@
 <script setup lang="ts">
 import DashboardCard from '@/components/DashboardCard.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
-import Button from '@/components/ui/button/Button.vue';
 import Card from '@/components/ui/card/Card.vue';
 import { type Machine, type MachineState } from '@/types/machine';
-import { Plus } from 'lucide-vue-next';
 
 const { machines } = defineProps<{ machines: Machine[] }>();
 

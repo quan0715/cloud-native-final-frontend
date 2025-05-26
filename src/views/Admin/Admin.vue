@@ -8,12 +8,12 @@
         <Tabs v-model="currentTab" class="w-full p-0 m-0">
           <TabsList>
             <TabsTrigger value="使用者管理" :class="tabTriggerClass"> 使用者管理 </TabsTrigger>
-            <TabsTrigger value="機器管理" :class="tabTriggerClass"> 機器管理 </TabsTrigger>
+            <TabsTrigger value="機器管理" :class="tabTriggerClass"  > 機器管理 </TabsTrigger>
             <TabsTrigger value="任務類型管理" :class="tabTriggerClass"> 任務類型管理 </TabsTrigger>
           </TabsList>
           <TabsContent value="使用者管理"> <UserManageTab :users="users" :taskTypes="taskTypes" @update="handleUserUpdate" @delete="handleUserDelete"   /> </TabsContent>
-          <TabsContent value="機器管理"> <MachineManageTab :machines="machines" :taskTypes="taskTypes" @delete="handleMachineDelete" @update="handleMachineUpdate" /> </TabsContent>
-          <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" @update="handleTaskTypeUpdate" @delete="handleTaskTypeDelete" /> </TabsContent>
+          <TabsContent value="機器管理"> <MachineManageTab :machines="machines" :taskTypes="taskTypes" @delete="handleMachineDelete" @update="handleMachineUpdate" @create="handleMachineCreate" /> </TabsContent>
+          <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" @update="handleTaskTypeUpdate" @delete="handleTaskTypeDelete" @create="handleTaskTypeCreate" /> </TabsContent>
           <Separator />
         </Tabs>
       </DashboardCard>
@@ -227,6 +227,45 @@ const handleUserUpdate = async (payload: {
 
   /* ---------- 6. 重新抓最新資料 ---------- */
   await fetchUsers()
+}
+
+async function handleMachineCreate(newMachine: { machineName: string; taskIds: string[] }) {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res  = await fetch(`${base}/machines`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      machineName: newMachine.machineName,
+      machine_task_types: newMachine.taskIds,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    const machine = (await res.json()) as Machine
+    await fetchMachines()
+    console.log('new machine:', machine)
+  }
+
+}
+
+async function handleTaskTypeCreate(payload: { taskName: string; number_of_machine: number }) {
+  console.log(payload)
+  const base = import.meta.env.VITE_API_BASE_URL
+  const res = await fetch(`${base}/task-types`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      taskName: payload.taskName,
+      number_of_machine: payload.number_of_machine,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  else {
+    const taskType = (await res.json()) as TaskType
+    await fetchTaskTypes()
+    console.log('new task type:', taskType)
+  }
+
 }
 
 </script>

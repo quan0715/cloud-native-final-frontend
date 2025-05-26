@@ -1,20 +1,20 @@
 <template>
-  <DashboardCard title="已指派（代完成）">
+  <DashboardCard title="已指派（待完成）">
     <div class="flex flex-col gap-3">
       <div
-        v-for="task in getTasks"
-        :key="task.id"
+        v-for="task in assignedTask"
+        :key="task._id"
         class="flex flex-col justify-start items-start gap-2 rounded-md p-3 border-2 border-gray-100"
       >
         <div class="px-2 bg-purple-50 rounded-xl">
-          <span class="text-[12px] text-sans font-semibold text-purple-600">{{ task.code }}</span>
+          <span class="text-[12px] text-sans font-semibold text-purple-600">{{ task.taskType?.taskName }}</span>
         </div>
         <p class="text-md text-sans font-semibold text-gray-600">
-          {{ task.name }}
+          {{ task.taskName }}
         </p>
         <div class="flex flex-row justify-start items-start gap-2">
           <p class="text-sm text-sans font-thin text-gray-500">
-            {{ task.requirement.join(' ') }}
+            {{ task.machine?.map((m) => m.machineName).join(', ') }}
           </p>
         </div>
       </div>
@@ -23,8 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import DashboardCard from '@/components/DashboardCard.vue'
-import { computed } from 'vue'
+import DashboardCard from '@/components/DashboardCard.vue';
+import type { TaskSnapshot } from '@/types/user';
+import { computed, defineProps } from 'vue';
+const { assignedTask } = defineProps<{ assignedTask: TaskSnapshot[] }>()
 const getTasks = computed(() => {
   return [
     {

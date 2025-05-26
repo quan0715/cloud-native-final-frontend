@@ -1,5 +1,5 @@
 import type { ISODate, ObjectId } from './base'
-import type { Task, TaskType } from './task'
+import type { TaskType } from './task'
 
 
 export enum UserRole {
@@ -25,8 +25,20 @@ export enum UserStatus {
   Assigned = '已指派',
 }
 
-export interface UserWithTasks extends User {
-  assignedTasks: Task[]
-  inProgressTasks: Task[]
-  completedTasks: Task[]
+export interface TaskSnapshot {
+  _id: ObjectId
+  taskName: string
+  state: TaskSnapshotState
+  taskType?: { taskName: string }
+  machine?: { machineName: string }[]
+}
+export type TaskSnapshotState = 'assigned' | 'in-progress' | 'success' | 'fail'
+
+export interface UserWithTasks{
+  _id: ObjectId
+  userName: string
+  userRole: UserRole
+  assignedTasks: TaskSnapshot[]
+  inProgressTasks: TaskSnapshot[]
+  completedTasks: TaskSnapshot[]
 }

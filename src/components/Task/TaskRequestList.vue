@@ -4,7 +4,7 @@
       <Button @click="$emit('create')" variant="outline">
         <div class="flex items-center gap-2">
           <Plus class="w-4 h-4" />
-          新增任務
+          新增任務類型
         </div>
       </Button>
     </template>

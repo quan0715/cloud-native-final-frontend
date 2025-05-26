@@ -51,7 +51,7 @@
                 <Button variant="secondary" @click="resetCreate">取消</Button>
               </DialogClose>
               <DialogClose as-child>
-                <Button type="submit">確定</Button>
+                <Button type="submit" >確定</Button>
               </DialogClose>
             </DialogFooter>
           </form>

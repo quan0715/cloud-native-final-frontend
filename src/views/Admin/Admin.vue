@@ -31,9 +31,11 @@ import type { User } from '@/types/user'
 import MachineManageTab from '@/views/Admin/MachineManageTab.vue'
 import TaskTypeManageTab from '@/views/Admin/TaskTypeManageTab.vue'
 import UserManageTab from '@/views/Admin/UserManageTab.vue'
-import { ref } from 'vue'
+import type { Ref } from 'vue'
+import { inject, ref } from 'vue'
 const currentTab = ref('使用者管理')
 const tabTriggerClass = 'w-full px-4 py-2'
+
 
 const handleTabChange = (tab: string) => {
   currentTab.value = tab
@@ -43,7 +45,7 @@ const handleTabChange = (tab: string) => {
 const users  = ref<User[]>([])
 const machines = ref<Machine[]>([])
 const taskTypes = ref<TaskType[]>([])
-const loading = ref(false)
+  const loading = inject<Ref<boolean>>('globalLoading')!
 const error   = ref<string | null>(null)
 
 async function fetchUsers() {

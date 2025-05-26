@@ -18,6 +18,8 @@
     </div>
 
     <!-- task running list -->
+    <!-- Skeleton 區 -->
+
     <TaskList :tasks="draftTask" :taskType="taskTypes" :is-draft="true" @create="handleNewTask"  class="w-full h-auto flex-1" />
 
     <!-- status and workers list -->
@@ -37,7 +39,8 @@ import UserAssignmentList from '@/components/User/UserAssignmentList.vue'
 import type { Machine } from '@/types/machine'
 import type { Task, TaskType } from '@/types/task'
 import type { User, UserWithTasks } from '@/types/user'
-import { computed, onMounted, ref } from 'vue'
+import type { Ref } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
@@ -46,7 +49,7 @@ const machines = ref<Machine[]>([])
 const taskTypes = ref<TaskType[]>([])
 const userAssignmentList = ref<UserWithTasks[]>([])
 const tasks = ref<Task[]>([])
-
+const loading = inject<Ref<boolean>>('globalLoading')!
 const username = localStorage.getItem('token')
 if (!username) {
   router.push('/login')
@@ -74,6 +77,7 @@ const pendingCount = computed(
 
 async function handleNewTask(newTask: { taskType: string; taskName: string }) {
   console.log(newTask.taskType)
+
   const base = import.meta.env.VITE_API_BASE_URL
   const res  = await fetch(`${base}/tasks`, {
     method: 'POST',
@@ -86,13 +90,13 @@ async function handleNewTask(newTask: { taskType: string; taskName: string }) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   else {
     const task = (await res.json()) as Task
+    loading.value = true
     await fetchTasks()
+    loading.value = false
     console.log('new task:', task)
   }
 }
 
-
-const loading = ref(false)
 const error   = ref<string | null>(null)
 async function fetchUsers() {
   loading.value = true

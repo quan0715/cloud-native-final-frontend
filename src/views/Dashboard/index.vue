@@ -3,7 +3,7 @@
     <div class="w-full flex flex-row justify-between items-center gap-2">
       <h1 class="w-fit text-3xl font-thin"><span class="text-blue-600">LAB 11</span> / 歡迎回來</h1>
       <div class="flex flex-row justify-end items-center gap-2">
-        <AddDraftButton @create="handleNewTask" />
+        <AddDraftButton @create="onTaskCreate" />
         <Button> 自動指派 </Button>
       </div>
     </div>
@@ -59,6 +59,7 @@ import type { User, UserWithTasks } from '@/types/user'
 import type { Ref } from 'vue'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { fetchTaskTypes } from '@/repositories/taskRepo'
 const router = useRouter()
 
 const users = ref<User[]>([])
@@ -128,23 +129,6 @@ async function fetchMachines() {
   }
 }
 
-async function fetchTaskTypes() {
-  loading.value = true
-  error.value = null
-  try {
-    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
-    const res = await fetch(`${base}/task-types`, {
-      // 若後端要帶 cookie
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    taskTypes.value = (await res.json()) as TaskType[]
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
-  } finally {
-    loading.value = false
-  }
-}
 async function fetchTasks() {
   loading.value = true
   error.value = null
@@ -180,7 +164,7 @@ async function fetchUserAssignmentList() {
   }
 }
 
-async function handleNewTask() {
+async function onTaskCreate() {
   await fetchTasks()
 }
 

@@ -69,6 +69,8 @@ import {
 import { Plus } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 import type { TaskType } from '@/types/task'
+import { fetchTaskTypes, createTask } from '@/repositories/taskRepo'
+import { toast } from '@/components/ui/toast/use-toast'
 
 const createOpen = ref(false)
 const createTypeId = ref('')
@@ -76,20 +78,12 @@ const createName = ref('')
 const taskType = ref<TaskType[]>([])
 
 onMounted(async () => {
-  taskType.value = await fetchTaskType()
+  taskType.value = await fetchTaskTypes()
 })
 
 function resetCreate() {
   createTypeId.value = ''
   createName.value = ''
-}
-
-async function fetchTaskType() {
-  const base = import.meta.env.VITE_API_BASE_URL
-  const res = await fetch(`${base}/task-types`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  const taskType = (await res.json()) as TaskType[]
-  return taskType
 }
 
 async function submitCreate() {
@@ -98,29 +92,25 @@ async function submitCreate() {
     return
   }
 
-  const base = import.meta.env.VITE_API_BASE_URL
   try {
-    const response = await fetch(`${base}/tasks`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        taskTypeId: createTypeId.value,
-        taskName: createName.value,
-      }),
+    await createTask({
+      taskTypeId: createTypeId.value,
+      taskName: createName.value,
     })
 
-    if (!response.ok) {
-      const errorBody = await response.text()
-      console.error('API Error:', response.status, errorBody)
-      alert(`新增任務失敗：${response.status} - ${errorBody || response.statusText}`)
-      throw new Error(`HTTP error ${response.status}`)
-    }
-
     emit('create')
+    toast({
+      title: '新增任務成功',
+      description: `任務 ${createName.value} (${taskType.value.find((t) => t._id === createTypeId.value)?.taskName})已新增`,
+    })
     resetCreate()
     createOpen.value = false
   } catch (error) {
     console.error('Submit create error:', error)
+    toast({
+      title: '新增任務失敗',
+      description: '新增任務失敗',
+    })
   }
 }
 

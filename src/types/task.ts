@@ -2,11 +2,11 @@
 import type { ISODate, ObjectId } from './base'
 export interface TaskType {
   _id: ObjectId
-  taskName: string              // 顯示名稱
-  number_of_machine: number     // 需要幾台機器
+  taskName: string // 顯示名稱
+  number_of_machine: number // 需要幾台機器
   createdAt: ISODate
   updatedAt: ISODate
-  __v?: number                  // Mongoose 版本號，可忽略
+  __v?: number // Mongoose 版本號，可忽略
 }
 
 export type TaskState = 'draft' | 'assigned' | 'in-progress' | 'success' | 'fail'
@@ -28,23 +28,27 @@ export interface TaskData {
 
 export interface Task {
   _id: ObjectId
-  taskTypeId: TaskType        // 後端直接帶 TaskType 物件
-  taskName: string            // ex: 電性測試-001
-  assigner_id: { _id: ObjectId, userName: string} | null
+  taskTypeId: TaskType // 後端直接帶 TaskType 物件
+  taskName: string // ex: 電性測試-001
+  assigner_id: { _id: ObjectId; userName: string } | null
   taskData: TaskData
   createdAt: ISODate
   updatedAt: ISODate
   __v?: number
 }
 
-
 export interface InprogressTask {
   _id: ObjectId
-  taskTypeId: TaskType        // 後端直接帶 TaskType 物件
-  taskName: string            // ex: 電性測試-001
+  taskTypeId: TaskType // 後端直接帶 TaskType 物件
+  taskName: string // ex: 電性測試-001
   assigner_id: ObjectId | null
   taskData: TaskData
   createdAt: ISODate
   updatedAt: ISODate
   __v?: number
+}
+
+export interface CreateTask {
+  taskTypeId: string
+  taskName: string
 }

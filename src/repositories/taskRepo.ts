@@ -12,9 +12,9 @@ export async function fetchTaskTypes(): Promise<TaskType[]> {
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const taskTypeList = (await res.json()) as TaskType[]
     return taskTypeList
-  } catch (e: any) {
+  } catch (e) {
     throw new Error(`
-      fetchTaskTypes error: ${e.message}
+      fetchTaskTypes error: ${e}
     `)
   }
 }
@@ -38,7 +38,7 @@ export async function createTask(task: CreateTask) {
     }
   } catch (e) {
     throw new Error(`
-      createTask error: ${e.message}
+      createTask error: ${e}
     `)
   }
 }

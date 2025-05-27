@@ -8,12 +8,34 @@
         <Tabs v-model="currentTab" class="w-full p-0 m-0">
           <TabsList>
             <TabsTrigger value="使用者管理" :class="tabTriggerClass"> 使用者管理 </TabsTrigger>
-            <TabsTrigger value="機器管理" :class="tabTriggerClass"  > 機器管理 </TabsTrigger>
+            <TabsTrigger value="機器管理" :class="tabTriggerClass"> 機器管理 </TabsTrigger>
             <TabsTrigger value="任務類型管理" :class="tabTriggerClass"> 任務類型管理 </TabsTrigger>
           </TabsList>
-          <TabsContent value="使用者管理"> <UserManageTab :users="users" :taskTypes="taskTypes" @update="handleUserUpdate" @delete="handleUserDelete"   /> </TabsContent>
-          <TabsContent value="機器管理"> <MachineManageTab :machines="machines" :taskTypes="taskTypes" @delete="handleMachineDelete" @update="handleMachineUpdate" @create="handleMachineCreate" /> </TabsContent>
-          <TabsContent value="任務類型管理"> <TaskTypeManageTab :taskTypes="taskTypes" @update="handleTaskTypeUpdate" @delete="handleTaskTypeDelete" @create="handleTaskTypeCreate" /> </TabsContent>
+          <TabsContent value="使用者管理">
+            <UserManageTab
+              :users="users"
+              :taskTypes="taskTypes"
+              @update="handleUserUpdate"
+              @delete="handleUserDelete"
+            />
+          </TabsContent>
+          <TabsContent value="機器管理">
+            <MachineManageTab
+              :machines="machines"
+              :taskTypes="taskTypes"
+              @delete="handleMachineDelete"
+              @update="handleMachineUpdate"
+              @create="handleMachineCreate"
+            />
+          </TabsContent>
+          <TabsContent value="任務類型管理">
+            <TaskTypeManageTab
+              :taskTypes="taskTypes"
+              @update="handleTaskTypeUpdate"
+              @delete="handleTaskTypeDelete"
+              @create="handleTaskTypeCreate"
+            />
+          </TabsContent>
           <Separator />
         </Tabs>
       </DashboardCard>
@@ -36,25 +58,21 @@ import { inject, ref } from 'vue'
 const currentTab = ref('使用者管理')
 const tabTriggerClass = 'w-full px-4 py-2'
 
-
-const handleTabChange = (tab: string) => {
-  currentTab.value = tab
-}
-
 // fetch /users
-const users  = ref<User[]>([])
+const users = ref<User[]>([])
 const machines = ref<Machine[]>([])
 const taskTypes = ref<TaskType[]>([])
-  const loading = inject<Ref<boolean>>('globalLoading')!
-const error   = ref<string | null>(null)
+const loading = inject<Ref<boolean>>('globalLoading')!
+const error = ref<string | null>(null)
 
 async function fetchUsers() {
   loading.value = true
-  error.value   = null
+  error.value = null
 
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/users`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/users`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -68,10 +86,11 @@ async function fetchUsers() {
 
 async function fetchMachines() {
   loading.value = true
-  error.value   = null
+  error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/machines`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/machines`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -86,10 +105,11 @@ async function fetchMachines() {
 
 async function fetchTaskTypes() {
   loading.value = true
-  error.value   = null
+  error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/task-types`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/task-types`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -107,7 +127,7 @@ fetchTaskTypes()
 
 const handleMachineDelete = async (id: string) => {
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/machines/${id}`, {
+  const res = await fetch(`${base}/machines/${id}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   })
@@ -117,15 +137,19 @@ const handleMachineDelete = async (id: string) => {
     console.log('deleted machine:', id)
   }
 }
-const handleMachineUpdate = async (payload: { _id: string; machineName: string; taskIds: string[] }) => {
+const handleMachineUpdate = async (payload: {
+  _id: string
+  machineName: string
+  taskIds: string[]
+}) => {
   console.log(payload)
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/machines/${payload._id}`, {
+  const res = await fetch(`${base}/machines/${payload._id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       machineName: payload.machineName,
-      machine_task_types : payload.taskIds,
+      machine_task_types: payload.taskIds,
     }),
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -137,7 +161,7 @@ const handleMachineUpdate = async (payload: { _id: string; machineName: string; 
 
 const handleTaskTypeDelete = async (id: string) => {
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/task-types/${id}`, {
+  const res = await fetch(`${base}/task-types/${id}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   })
@@ -148,10 +172,14 @@ const handleTaskTypeDelete = async (id: string) => {
   }
 }
 
-const handleTaskTypeUpdate = async (payload: { _id: string; taskName: string; number_of_machine: number }) => {
+const handleTaskTypeUpdate = async (payload: {
+  _id: string
+  taskName: string
+  number_of_machine: number
+}) => {
   console.log(payload)
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/task-types/${payload._id}`, {
+  const res = await fetch(`${base}/task-types/${payload._id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -168,7 +196,7 @@ const handleTaskTypeUpdate = async (payload: { _id: string; taskName: string; nu
 
 const handleUserDelete = async (id: string) => {
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/users/${id}`, {
+  const res = await fetch(`${base}/users/${id}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   })
@@ -202,7 +230,7 @@ const handleUserUpdate = async (payload: {
   const taskIdsOld = userOld ? userOld.user_task_types.map((t) => t._id) : []
 
   /* ---------- 3. 比較差集 ---------- */
-  const toAdd    = payload.taskIds.filter((id) => !taskIdsOld.includes(id))
+  const toAdd = payload.taskIds.filter((id) => !taskIdsOld.includes(id))
   const toRemove = taskIdsOld.filter((id) => !payload.taskIds.includes(id))
 
   /* ---------- 4. 新增任務類型 ---------- */
@@ -233,7 +261,7 @@ const handleUserUpdate = async (payload: {
 
 async function handleMachineCreate(newMachine: { machineName: string; taskIds: string[] }) {
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/machines`, {
+  const res = await fetch(`${base}/machines`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -247,7 +275,6 @@ async function handleMachineCreate(newMachine: { machineName: string; taskIds: s
     await fetchMachines()
     console.log('new machine:', machine)
   }
-
 }
 
 async function handleTaskTypeCreate(payload: { taskName: string; number_of_machine: number }) {
@@ -267,7 +294,5 @@ async function handleTaskTypeCreate(payload: { taskName: string; number_of_machi
     await fetchTaskTypes()
     console.log('new task type:', taskType)
   }
-
 }
-
 </script>

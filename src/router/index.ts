@@ -1,5 +1,5 @@
 import MainLayout from '@/layouts/MainLayout.vue'
-import DashboardView from '@/views/DashboardView.vue'
+import DashboardView from '@/views/Dashboard/index.vue'
 import Task from '@/views/Task/Task.vue'
 import Admin from '@/views/Admin/Admin.vue'
 import Login from '@/views/Login.vue'

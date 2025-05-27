@@ -1,25 +1,30 @@
 <template>
   <DashboardCard title="進行中任務">
     <div v-if="inprogressTask && inprogressTask.length > 0">
-      <div v-for="task in inprogressTask" class="flex flex-col justify-start items-start gap-2 p-2">
+      <div
+        v-for="task in inprogressTask"
+        :key="task._id"
+        class="flex flex-col justify-start items-start gap-2 p-2"
+      >
         <div class="px-2 py-1 bg-purple-50 rounded-xl">
-          <span class="text-sm text-sans font-semibold text-purple-600">{{
-            task._id
-          }}</span>
+          <span class="text-sm text-sans font-semibold text-purple-600">{{ task._id }}</span>
         </div>
         <p class="text-xl text-sans font-semibold text-gray-600">
           {{ task.taskName }}
         </p>
       </div>
       <Separator class="w-full my-2" />
-      <div v-for="task in inprogressTask" class="grid grid-cols-3 gap-2">
+      <div v-for="task in inprogressTask" :key="task._id" class="grid grid-cols-3 gap-2">
         <div
           v-for="(machine, idx) in task.machine"
           :key="idx"
           class="col-span-1 flex flex-row justify-start items-start gap-2"
         >
           <DashboardData title="佔用機器" :content="machine.machineName" />
-          <Separator orientation="vertical" v-if="task.machine && idx !== task.machine.length - 1" />
+          <Separator
+            orientation="vertical"
+            v-if="task.machine && idx !== task.machine.length - 1"
+          />
         </div>
       </div>
       <Separator class="w-full my-2" />

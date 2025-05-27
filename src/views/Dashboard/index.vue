@@ -14,13 +14,18 @@
         :is-draft="false"
         class="w-full h-auto flex-2"
       />
-
     </div>
 
     <!-- task running list -->
     <!-- Skeleton 區 -->
 
-    <TaskList :tasks="draftTask" :taskType="taskTypes" :is-draft="true" @create="handleNewTask"  class="w-full h-auto flex-1" />
+    <TaskList
+      :tasks="draftTask"
+      :taskType="taskTypes"
+      :is-draft="true"
+      @create="handleNewTask"
+      class="w-full h-auto flex-1"
+    />
 
     <!-- status and workers list -->
     <div class="flex flex-col space-y-4">
@@ -33,7 +38,7 @@
 <script setup lang="ts">
 import MachineStatusList from '@/components/Machine/MachineStatusList.vue'
 import TaskList from '@/components/Task/TaskList.vue'
-import TaskSummaryCard from '@/components/Task/TaskSummaryCard.vue'
+import TaskSummaryCard from '@/views/Dashboard/TaskSummaryCard.vue'
 import UserAssignmentList from '@/components/User/UserAssignmentList.vue'
 // Value import for component and enum
 import type { Machine } from '@/types/machine'
@@ -44,7 +49,7 @@ import { computed, inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-const users  = ref<User[]>([])
+const users = ref<User[]>([])
 const machines = ref<Machine[]>([])
 const taskTypes = ref<TaskType[]>([])
 const userAssignmentList = ref<UserWithTasks[]>([])
@@ -54,7 +59,6 @@ const username = localStorage.getItem('token')
 if (!username) {
   router.push('/login')
 }
-
 
 const draftTask = computed(() => {
   return tasks.value.filter((t: Task) => t.taskData.state === 'draft')
@@ -74,12 +78,11 @@ const pendingCount = computed(
   () => tasks.value.filter((t: Task) => t.taskData.state !== 'assigned').length,
 )
 
-
 async function handleNewTask(newTask: { taskType: string; taskName: string }) {
   console.log(newTask.taskType)
 
   const base = import.meta.env.VITE_API_BASE_URL
-  const res  = await fetch(`${base}/tasks`, {
+  const res = await fetch(`${base}/tasks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -97,14 +100,15 @@ async function handleNewTask(newTask: { taskType: string; taskName: string }) {
   }
 }
 
-const error   = ref<string | null>(null)
+const error = ref<string | null>(null)
 async function fetchUsers() {
   loading.value = true
-  error.value   = null
+  error.value = null
 
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/users`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/users`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -118,10 +122,11 @@ async function fetchUsers() {
 
 async function fetchMachines() {
   loading.value = true
-  error.value   = null
+  error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/machines`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/machines`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -135,10 +140,11 @@ async function fetchMachines() {
 
 async function fetchTaskTypes() {
   loading.value = true
-  error.value   = null
+  error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/task-types`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/task-types`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -151,10 +157,11 @@ async function fetchTaskTypes() {
 }
 async function fetchTasks() {
   loading.value = true
-  error.value   = null
+  error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/tasks`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/tasks`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -167,10 +174,11 @@ async function fetchTasks() {
 }
 async function fetchUserAssignmentList() {
   loading.value = true
-  error.value   = null
+  error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL      // .env 裡設定
-    const res  = await fetch(`${base}/users/with-tasks`, {                         // 若後端要帶 cookie
+    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
+    const res = await fetch(`${base}/users/with-tasks`, {
+      // 若後端要帶 cookie
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -181,8 +189,6 @@ async function fetchUserAssignmentList() {
     loading.value = false
   }
 }
-
-
 
 onMounted(async () => {
   loading.value = true
@@ -206,6 +212,4 @@ onMounted(async () => {
   console.log('fetch tasks:', tasks.value)
   console.log('fetch user assignment list:', userAssignmentList.value)
 })
-
-
 </script>

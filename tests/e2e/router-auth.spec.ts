@@ -40,6 +40,56 @@ test('worker cannot access /admin and is redirected back with toast', async ({ p
   await expect(toast).toBeVisible()
 })
 
+test('worker cannot access /leader and is redirected back with toast', async ({ page }) => {
+  await login(page, 'worker001', '123456')
+  await expect(page).toHaveURL('/task')
+
+  await page.goto('/dashboard')
+  await expect(page).toHaveURL('/task')
+  const toast = page.locator('li[role="alert"][title="您沒有權限訪問此頁面。"]')
+  await expect(toast).toBeVisible()
+})
+
+test('leader cannot access /worker and is redirected back with toast', async ({ page }) => {
+  await login(page, 'leader001', '123456')
+  await expect(page).toHaveURL('/dashboard')
+
+  await page.goto('/task')
+  await expect(page).toHaveURL('/dashboard')
+  const toast = page.locator('li[role="alert"][title="您沒有權限訪問此頁面。"]')
+  await expect(toast).toBeVisible()
+})
+
+test('leader cannot access /admin and is redirected back with toast', async ({ page }) => {
+  await login(page, 'leader001', '123456')
+  await expect(page).toHaveURL('/dashboard')
+
+  await page.goto('/admin')
+  await expect(page).toHaveURL('/dashboard')
+  const toast = page.locator('li[role="alert"][title="您沒有權限訪問此頁面。"]')
+  await expect(toast).toBeVisible()
+})
+
+test('admin cannot access /worker and is redirected back with toast', async ({ page }) => {
+  await login(page, 'admin001', '123456')
+  await expect(page).toHaveURL('/admin')
+
+  await page.goto('/task')
+  await expect(page).toHaveURL('/admin')
+  const toast = page.locator('li[role="alert"][title="您沒有權限訪問此頁面。"]')
+  await expect(toast).toBeVisible()
+})
+
+test('admin cannot access /leader and is redirected back with toast', async ({ page }) => {
+  await login(page, 'admin001', '123456')
+  await expect(page).toHaveURL('/admin')
+
+  await page.goto('/dashboard')
+  await expect(page).toHaveURL('/admin')
+  const toast = page.locator('li[role="alert"][title="您沒有權限訪問此頁面。"]')
+  await expect(toast).toBeVisible()
+})
+
 test('logged-in user trying to access /login is redirected to default route', async ({ page }) => {
   await login(page, 'leader001', '123456')
   await expect(page).toHaveURL('/dashboard')

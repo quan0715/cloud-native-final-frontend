@@ -1,5 +1,6 @@
 <template>
   <DashboardCard title="實驗室人員管理" class="w-full">
+
     <div class="flex flex-col gap-2">
       <div
         v-for="u in users"

@@ -44,30 +44,6 @@ const routes = [
         meta: {
           title: '管理員儀錶板',
         },
-        // redirect: '/task',
-        // children: [
-        //   {
-        //     path: 'task',
-        //     component: Admin,
-        //     meta: {
-        //       title: '管理員儀錶板/任務類型管理',
-        //     },
-        //   },
-        //   {
-        //     path: 'user',
-        //     component: Admin,
-        //     meta: {
-        //       title: '管理員儀錶板/實驗室人員管理',
-        //     },
-        //   },
-        //   {
-        //     path: 'machine',
-        //     component: Admin,
-        //     meta: {
-        //       title: '管理員儀錶板/實驗室機器管理',
-        //     },
-        //   },
-        // ],
       },
     ],
   },

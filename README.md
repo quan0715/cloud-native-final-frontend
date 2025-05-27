@@ -51,6 +51,11 @@ npx playwright install
 npm run test:e2e
 ```
 
+- E2E Report
+```sh
+npm run report:e2e
+```
+
 ## 套件使用
 
 - CSS: tailwind css v3

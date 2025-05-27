@@ -7,7 +7,7 @@
       </div>
 
       <div class="text-center flex-1">
-        <p class="text-sm text-gray-500">已完成</p>
+        <p class="text-sm text-gray-500">已指派</p>
         <p class="text-2xl font-bold">{{ completed }}</p>
       </div>
       <div class="text-center flex-1">

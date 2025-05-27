@@ -2,19 +2,19 @@
   <DashboardCard title="測試任務總覽">
     <div class="flex justify-between items-center p-2 gap-4">
       <div class="text-left flex-1 flex flex-col justify-start items-start gap-1">
-        <ColorBadge label="總測試數量" primaryColor="397EFF" />
+        <ColorBadge label="總測試數" primaryColor="397EFF" />
 
         <p class="text-2xl font-thin">{{ total }}</p>
       </div>
       <Separator orientation="vertical" />
       <div class="text-left flex-1 flex flex-col justify-start items-start gap-1">
-        <ColorBadge label="代指派任務數量" primaryColor="3E3E3E" />
+        <ColorBadge label="等待指派" primaryColor="3E3E3E" />
 
         <p class="text-2xl font-thin">{{ completed }}</p>
       </div>
       <Separator orientation="vertical" />
       <div class="text-left flex-1 flex flex-col justify-start items-start gap-1">
-        <ColorBadge label="未結單任務" primaryColor="D9730D" />
+        <ColorBadge label="未結單" primaryColor="8F65AF" />
         <p class="text-2xl font-thin">{{ pending }}</p>
       </div>
     </div>

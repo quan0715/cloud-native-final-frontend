@@ -30,7 +30,7 @@ export interface Task {
   _id: ObjectId
   taskTypeId: TaskType        // 後端直接帶 TaskType 物件
   taskName: string            // ex: 電性測試-001
-  assigner_id: ObjectId | null
+  assigner_id: { _id: ObjectId, userName: string} | null
   taskData: TaskData
   createdAt: ISODate
   updatedAt: ISODate

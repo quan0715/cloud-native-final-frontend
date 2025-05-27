@@ -22,11 +22,12 @@ import type { UserWithTasks } from '@/types/user'
 import AssignedTaskCard from '@/views/Task/AssignedTaskCard.vue'
 import InprogressTaskCard from '@/views/Task/InprogressTaskCard.vue'
 import UserWeaklyReview from '@/views/Task/UserWeaklyReview.vue'
-import { computed, onMounted, ref } from 'vue'
+import type { Ref } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 
 const { username } = useUserData()
 
-const loading     = ref(false)
+const loading = inject<Ref<boolean>>('globalLoading')!
 const error       = ref<string | null>(null)
 const usersTasks  = ref<UserWithTasks[]>([])
 const userTasks   = ref<UserWithTasks | undefined>()

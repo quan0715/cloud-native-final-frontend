@@ -1,5 +1,51 @@
 <template>
   <DashboardCard title="任務類型管理" class="w-full">
+    <template #action>
+      <Dialog v-model:open="createOpen">
+        <DialogTrigger as-child>
+          <Button variant="outline">
+            <div class="flex items-center gap-2">
+              <Plus class="w-4 h-4" />
+              新增任務類型
+            </div>
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent class="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>新增任務類型</DialogTitle>
+          </DialogHeader>
+
+          <div class="space-y-4">
+            <!-- 任務名稱 -->
+            <div>
+              <Label class="mb-1 block">任務名稱</Label>
+              <Input v-model="createName" placeholder="如：電性測試" />
+            </div>
+
+            <!-- 所需機台數 -->
+            <div>
+              <Label class="mb-1 block">所需機台數</Label>
+              <Input
+                type="number"
+                min="1"
+                v-model.number="createNum"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose as-child>
+              <Button variant="secondary" @click="resetCreate">取消</Button>
+            </DialogClose>
+            <DialogClose as-child>
+              <Button @click="submitCreate">確定</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </template>
+
     <div class="flex flex-col gap-2">
       <div
         v-for="t in taskTypes"
@@ -121,8 +167,9 @@ import { Label } from '@/components/ui/label';
 
 import { Separator } from '@/components/ui/separator';
 import type { TaskType } from '@/types/task';
-import { Edit, Trash } from 'lucide-vue-next';
+import { Edit, Plus, Trash } from 'lucide-vue-next';
 import { defineEmits, defineProps, ref } from 'vue';
+
 
 /* --- props & emit --------------------------------------------------- */
 const props = defineProps<{ taskTypes: TaskType[] }>()
@@ -130,6 +177,7 @@ const props = defineProps<{ taskTypes: TaskType[] }>()
 const emit = defineEmits<{
   (e: 'update', payload: { _id: string; taskName: string; number_of_machine: number }): void
   (e: 'delete', id: string): void
+  (e: 'create', payload: { taskName: string; number_of_machine: number }): void
 }>()
 
 /* --- local edit state ---------------------------------------------- */
@@ -156,5 +204,20 @@ function openEdit(t: TaskType) {
   editName.value = t.taskName
   editNum.value  = t.number_of_machine
   console.log('openEdit', t._id, t.taskName, t.number_of_machine)
+}
+
+const createOpen = ref(false)
+const createName = ref('')
+const createNum  = ref<number>(0)
+
+function resetCreate() {
+  createName.value = ''
+  createNum.value  = 0
+}
+
+function submitCreate() {
+  if (!createName.value || !createNum.value) return
+  emit('create', { taskName: createName.value, number_of_machine: createNum.value })
+  resetCreate()
 }
 </script>

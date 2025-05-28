@@ -117,7 +117,7 @@ function openNewTaskDialog() {
 
 async function handleTaskSavedOrDeleted() {
   isDialogVisible.value = false // 關閉對話框
-  await fetchDraftTasks() // 改為只獲取草稿任務，因為 TaskSummary 被註釋掉了
+  await fetchAllTasks()
   console.log('Task saved or deleted, draft tasks list refreshed.')
 }
 

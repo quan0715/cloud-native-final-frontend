@@ -8,5 +8,5 @@ export const useUserData = () => {
   const username = decodedToken.id
   const roleLabel = decodedToken.role
 
-  return { username, roleLabel }
+  return { username, userId: decodedToken.id, roleLabel }
 }

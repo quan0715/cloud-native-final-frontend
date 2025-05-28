@@ -1,7 +1,6 @@
 import type { ISODate, ObjectId } from './base'
 import type { TaskType } from './task'
 
-
 export enum UserRole {
   Admin = 'admin',
   Leader = 'leader',
@@ -34,9 +33,10 @@ export interface TaskSnapshot {
 }
 export type TaskSnapshotState = 'assigned' | 'in-progress' | 'success' | 'fail'
 
-export interface UserWithTasks{
+export interface UserWithTasks {
   _id: ObjectId
   userName: string
+  user_task_types: TaskType[]
   userRole: UserRole
   assignedTasks: TaskSnapshot[]
   inProgressTasks: TaskSnapshot[]

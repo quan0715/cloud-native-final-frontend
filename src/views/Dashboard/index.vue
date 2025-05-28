@@ -1,193 +1,198 @@
 <template>
-  <div class="w-full h-full flex flex-col justify-start items-start p-4 gap-4">
-    <div class="w-full flex flex-row justify-between items-center gap-2">
-      <h1 class="w-fit text-3xl font-thin"><span class="text-blue-600">LAB 11</span> / 歡迎回來</h1>
-      <div class="flex flex-row justify-end items-center gap-2">
-        <AddDraftButton @create="onTaskCreate" />
-        <Button> 自動指派 </Button>
+  <div class="max-w-5xl w-full mx-auto flex flex-col justify-start items-start">
+    <div class="w-full flex flex-col justify-start items-start p-4 gap-4">
+      <div class="w-full flex flex-row justify-between items-center gap-2">
+        <h1 class="w-fit text-3xl font-thin">
+          <span class="text-blue-600">LAB 11</span> / 歡迎回來
+        </h1>
       </div>
-    </div>
-    <Separator orientation="horizontal" />
-    <div class="w-full grid grid-cols-3 gap-4 h-full">
-      <!-- task dashboard -->
-      <div class="flex flex-col space-y-4">
-        <TaskSummaryCard
-          :total="totalTasks"
-          :completed="assignedCount"
-          :pending="pendingCount"
-          class="w-full min-h-1/3 flex-1"
-        />
-        <TaskList
-          :tasks="assignedTask"
-          :taskType="taskTypes"
-          :is-draft="false"
-          class="w-full h-auto flex-2"
-        />
-      </div>
-
-      <!-- task running list -->
-      <!-- Skeleton 區 -->
-
-      <TaskList
-        :tasks="draftTask"
-        :taskType="taskTypes"
-        :is-draft="true"
-        class="w-full h-auto flex-1"
+      <TaskSummaryCard
+        :total="totalTasks"
+        :draft="draftCount"
+        :inProgress="uncompletedTaskCount"
+        class="w-full h-fit"
       />
-
-      <!-- status and workers list -->
-      <div class="flex flex-col space-y-4">
-        <MachineStatusList :machines="machines" class="w-full h-auto flex-1" />
-        <UserAssignmentList :userAssignmentList="userAssignmentList" class="w-full h-auto flex-1" />
+      <Separator orientation="horizontal" />
+      <div class="w-full flex flex-row justify-between items-center gap-2">
+        <h1 class="w-fit text-3xl font-thin">任務草稿佇列</h1>
+        <div class="flex flex-row justify-end items-center gap-2">
+          <Button variant="outline" @click="openNewTaskDialog">
+            <Plus class="w-4 h-4" />
+            新增任務
+          </Button>
+          <Button @click="openAutoAssignDrawer"> 自動指派 </Button>
+        </div>
       </div>
+      <div class="w-full grid grid-cols-3 gap-4 h-full">
+        <DraftTask
+          v-for="task in draftTask"
+          :key="task._id"
+          :task="task"
+          class="w-full h-auto flex-1"
+        />
+      </div>
+      <Separator orientation="horizontal" />
+      <div class="w-full flex flex-row justify-between items-center gap-2">
+        <h1 class="w-fit text-3xl font-thin">未結單任務</h1>
+      </div>
+      <div class="w-full grid grid-cols-3 gap-4 h-full">
+        <TaskCard
+          v-for="task in uncompletedTask"
+          :key="task._id"
+          :task="task"
+          class="w-full h-auto flex-1"
+        />
+      </div>
+      <Separator orientation="horizontal" />
+      <h1 class="w-fit text-3xl font-thin">機器</h1>
+      <div class="w-full grid grid-cols-3 gap-4 h-full">
+        <MachinePreviewCard
+          v-for="machine in machines"
+          :key="machine._id"
+          :machine="machine"
+          class="w-full h-auto flex-1"
+        />
+      </div>
+      <Separator orientation="horizontal" />
+      <h1 class="w-fit text-3xl font-thin">人員</h1>
+      <div class="w-full grid grid-cols-3 gap-4 h-full">
+        <WorkerPreviewCard
+          v-for="worker in workers"
+          :key="worker._id"
+          :worker="worker"
+          class="w-full h-auto flex-1"
+        />
+      </div>
+      <Separator orientation="horizontal" />
     </div>
   </div>
+  <TaskFormDialog
+    v-model:modelValue="isDialogVisible"
+    :taskToEdit="currentTaskToEdit"
+    @taskSaved="handleTaskSavedOrDeleted"
+    @taskDeleted="handleTaskSavedOrDeleted"
+  />
+  <AutoAssignSheet
+    :open="isAutoAssignDrawerOpen"
+    :assignerId="userId"
+    @update:open="isAutoAssignDrawerOpen = $event"
+    @assignments-confirmed="handleAssignmentsConfirmed"
+  />
 </template>
 
 <script setup lang="ts">
-import MachineStatusList from '@/components/Machine/MachineStatusList.vue'
-import TaskList from '@/views/Dashboard/TaskList.vue'
-import TaskSummaryCard from '@/views/Dashboard/TaskSummaryCard.vue'
-import UserAssignmentList from '@/components/User/UserAssignmentList.vue'
+import MachinePreviewCard from '@/components/Machine/MachinePreviewCard.vue'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import AddDraftButton from '@/views/Dashboard/AddDraftButton.vue'
-// Value import for component and enum
-import type { Machine } from '@/types/machine'
-import type { Task, TaskType } from '@/types/task'
-import type { User, UserWithTasks } from '@/types/user'
-import type { Ref } from 'vue'
-import { computed, inject, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { fetchTaskTypes } from '@/repositories/taskRepo'
-const router = useRouter()
 
-const users = ref<User[]>([])
+import TaskFormDialog from '@/views/Dashboard/TaskFormDialog.vue'
+import DraftTask from '@/components/Task/DraftTask.vue'
+import TaskCard from '@/components/Task/TaskCard.vue'
+import AutoAssignSheet from '@/components/Task/AutoAssignSheet.vue'
+import type { Machine } from '@/types/machine'
+import type { Task } from '@/types/task'
+import type { UserWithTasks } from '@/types/user'
+import { computed, inject, onMounted, ref, type Ref } from 'vue'
+import { Plus } from 'lucide-vue-next'
+import WorkerPreviewCard from '@/components/User/WorkerPreviewCard.vue'
+import TaskSummaryCard from '@/views/Dashboard/TaskSummaryCard.vue'
+import { useUserData } from '@/composables/useUserData'
+import { getAllTasks as getAllTasksFromRepo } from '@/repositories/taskRepo'
+import { fetchMachines as fetchMachinesFromRepo } from '@/repositories/MachineRepo'
+import { fetchWorkers as fetchWorkersFromRepo } from '@/repositories/WorkerRepo'
+
 const machines = ref<Machine[]>([])
-const taskTypes = ref<TaskType[]>([])
-const userAssignmentList = ref<UserWithTasks[]>([])
-const tasks = ref<Task[]>([])
+const workers = ref<UserWithTasks[]>([])
 const loading = inject<Ref<boolean>>('globalLoading')!
-const username = localStorage.getItem('token')
-if (!username) {
-  router.push('/login')
+const isDialogVisible = ref(false)
+const currentTaskToEdit = ref<Task | null>(null)
+const tasks = ref<Task[]>([]) // 您的任務列表數據
+const isAutoAssignDrawerOpen = ref(false)
+const { userId } = useUserData()
+
+function openNewTaskDialog() {
+  currentTaskToEdit.value = null
+  isDialogVisible.value = true
 }
+
+async function handleTaskSavedOrDeleted() {
+  isDialogVisible.value = false // 關閉對話框
+  await fetchAllTasks()
+  console.log('Task saved or deleted, draft tasks list refreshed.')
+}
+
+const totalTasks = computed(() => tasks.value.length)
+
+const draftCount = computed(() => draftTask.value.length)
+const uncompletedTaskCount = computed(() => uncompletedTask.value.length)
 
 const draftTask = computed(() => {
   return tasks.value.filter((t: Task) => t.taskData.state === 'draft')
 })
 
-const assignedTask = computed(() => {
-  console.log('assignedTask:', tasks.value)
-  return tasks.value.filter((t: Task) => t.taskData.state != 'draft')
+const uncompletedTask = computed(() => {
+  return tasks.value.filter(
+    (t: Task) => t.taskData.state != 'draft' && t.taskData.state != 'success',
+  )
 })
 
-const totalTasks = computed(() => tasks.value.length)
-
-const assignedCount = computed(
-  () => tasks.value.filter((t: Task) => t.taskData.state == 'assigned').length,
-)
-const pendingCount = computed(
-  () => tasks.value.filter((t: Task) => t.taskData.state !== 'assigned').length,
-)
-
 const error = ref<string | null>(null)
-async function fetchUsers() {
+
+async function fetchWorkers() {
   loading.value = true
   error.value = null
-
   try {
-    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
-    const res = await fetch(`${base}/users`, {
-      // 若後端要帶 cookie
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    users.value = (await res.json()) as User[]
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
+    workers.value = await fetchWorkersFromRepo()
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : '取得使用者列表時發生錯誤'
+    console.error('fetchUsers error:', errorMessage, e)
+    error.value = errorMessage
   } finally {
     loading.value = false
   }
 }
 
-async function fetchMachines() {
+async function getAllMachines() {
   loading.value = true
   error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
-    const res = await fetch(`${base}/machines`, {
-      // 若後端要帶 cookie
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    machines.value = (await res.json()) as Machine[]
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
+    machines.value = await fetchMachinesFromRepo()
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : '取得機器列表時發生錯誤'
+    console.error('getAllMachines error:', errorMessage, e)
+    error.value = errorMessage
   } finally {
     loading.value = false
   }
 }
 
-async function fetchTasks() {
+async function fetchAllTasks() {
   loading.value = true
-  error.value = null
-  try {
-    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
-    const res = await fetch(`${base}/tasks`, {
-      // 若後端要帶 cookie
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    tasks.value = (await res.json()) as Task[]
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
-  } finally {
-    loading.value = false
-  }
-}
-async function fetchUserAssignmentList() {
-  loading.value = true
-  error.value = null
-  try {
-    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
-    const res = await fetch(`${base}/users/with-tasks`, {
-      // 若後端要帶 cookie
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    userAssignmentList.value = (await res.json()) as UserWithTasks[]
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
-  } finally {
-    loading.value = false
-  }
+  tasks.value = (await getAllTasksFromRepo()) as Task[]
+  loading.value = false
 }
 
-async function onTaskCreate() {
-  await fetchTasks()
+function openAutoAssignDrawer() {
+  isAutoAssignDrawerOpen.value = true
+}
+
+async function handleAssignmentsConfirmed() {
+  isAutoAssignDrawerOpen.value = false // Close the drawer
+  await fetchAllTasks() // Refresh draft tasks as assignments likely affect them
+  console.log('Auto assignments confirmed, draft tasks list refreshed.')
 }
 
 onMounted(async () => {
   loading.value = true
   error.value = null
   try {
-    await Promise.all([
-      fetchUsers(),
-      fetchMachines(),
-      fetchTaskTypes(),
-      fetchTasks(),
-      fetchUserAssignmentList(),
-    ])
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
+    await Promise.all([fetchWorkers(), getAllMachines(), fetchAllTasks()])
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : '頁面初始化載入資料時發生錯誤'
+    console.error('onMounted fetchAll error:', errorMessage, e)
+    error.value = errorMessage
   } finally {
     loading.value = false
   }
-  console.log('fetch users:', users.value)
-  console.log('fetch machines:', machines.value)
-  console.log('fetch task types:', taskTypes.value)
-  console.log('fetch tasks:', tasks.value)
-  console.log('fetch user assignment list:', userAssignmentList.value)
 })
 </script>

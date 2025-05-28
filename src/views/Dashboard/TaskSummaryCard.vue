@@ -1,28 +1,22 @@
 <template>
   <DashboardCard title="測試任務總覽">
     <div class="flex justify-between items-center p-2 gap-4">
-      <div class="text-left flex-1 flex flex-col justify-start items-start gap-1">
-        <ColorBadge label="總測試數" primaryColor="397EFF" />
-
-        <p class="text-2xl font-thin">{{ total }}</p>
-      </div>
-      <Separator orientation="vertical" />
-      <div class="text-left flex-1 flex flex-col justify-start items-start gap-1">
-        <ColorBadge label="等待指派" primaryColor="3E3E3E" />
-
-        <p class="text-2xl font-thin">{{ completed }}</p>
-      </div>
-      <Separator orientation="vertical" />
-      <div class="text-left flex-1 flex flex-col justify-start items-start gap-1">
-        <ColorBadge label="未結單" primaryColor="8F65AF" />
-        <p class="text-2xl font-thin">{{ pending }}</p>
+      <div
+        v-for="item in dataConfig"
+        :key="item.label"
+        class="flex flex-row justify-start items-center gap-2 w-full"
+      >
+        <div class="flex-1 flex flex-col justify-start items-start gap-1">
+          <ColorBadge :label="item.label" :primaryColor="item.primaryColor" />
+          <p class="px-1 text-2xl font-thin">{{ item.value }}</p>
+        </div>
+        <Separator
+          v-if="item.label !== dataConfig[dataConfig.length - 1].label"
+          orientation="vertical"
+          class="h-16"
+        />
       </div>
     </div>
-    <!-- <div class="flex flex-col justify-start items-start gap-1 text-[12px] text-gray-500">
-      <p>總測試數量: 目前總測試需求（包含草稿與未結單數量）</p>
-      <p>已指派: 預計測試需求（還未指派）</p>
-      <p>進行中: 目前已經指派出去但未結單的任務數量</p>
-    </div> -->
   </DashboardCard>
 </template>
 
@@ -30,13 +24,31 @@
 import DashboardCard from '@/components/DashboardCard.vue'
 import { Separator } from '@/components/ui/separator'
 import { defineProps } from 'vue'
+import { computed } from 'vue'
 import ColorBadge from '@/components/ColorBadge.vue'
 
 interface Props {
   total: number
-  completed: number
-  pending: number
+  draft: number
+  inProgress: number
 }
 
-const { total, completed, pending } = defineProps<Props>()
+const { total, draft, inProgress } = defineProps<Props>()
+const dataConfig = computed(() => [
+  {
+    label: '總測試數',
+    value: total,
+    primaryColor: '397EFF',
+  },
+  {
+    label: '等待指派',
+    value: draft,
+    primaryColor: '3E3E3E',
+  },
+  {
+    label: '未結單',
+    value: inProgress,
+    primaryColor: '8F65AF',
+  },
+])
 </script>

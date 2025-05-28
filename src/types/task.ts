@@ -52,3 +52,12 @@ export interface CreateTask {
   taskTypeId: string
   taskName: string
 }
+
+export interface AutoAssignPreview {
+  taskId: string
+  taskName: string
+  previewAssignee?: {
+    _id: string
+    userName: string
+  }
+}

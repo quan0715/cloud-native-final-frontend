@@ -99,6 +99,10 @@
 
                   <!-- 顏色選擇 -->
                   <ColorPicker v-model="editColor" label="任務類型顏色" />
+                  <div class="flex items-center gap-2">
+                    <Label class="text-sm text-gray-600">標籤預覽</Label>
+                    <ColorBadge :label="editName" :primaryColor="editColor" />
+                  </div>
                 </div>
 
                 <DialogFooter>

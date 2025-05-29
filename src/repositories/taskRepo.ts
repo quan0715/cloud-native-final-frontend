@@ -2,6 +2,8 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL
 const taskTypeEndPoint = `${baseUrl}/task-types`
 const taskEndPoint = `${baseUrl}/tasks`
 import type { TaskType, CreateTask, Task, AutoAssignPreview } from '@/types/task'
+import type { CreateTaskType } from '@/types/taskType'
+
 export async function fetchTaskTypes(): Promise<TaskType[]> {
   try {
     const res = await fetch(taskTypeEndPoint, {
@@ -18,6 +20,34 @@ export async function fetchTaskTypes(): Promise<TaskType[]> {
   }
 }
 
+export async function createTaskType(newTaskType: CreateTaskType) {
+  const response = await fetch(taskTypeEndPoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newTaskType),
+  })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  return response.json()
+}
+
+export async function updateTaskType(taskTypeId: string, taskType: CreateTaskType) {
+  const response = await fetch(`${taskTypeEndPoint}/${taskTypeId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(taskType),
+  })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  return response.json()
+}
+
+export async function deleteTaskType(taskTypeId: string) {
+  const response = await fetch(`${taskTypeEndPoint}/${taskTypeId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  return response.json()
+}
 export async function getAllTasks(): Promise<Task[]> {
   const response = await fetch(taskEndPoint, {
     headers: { 'Content-Type': 'application/json' },

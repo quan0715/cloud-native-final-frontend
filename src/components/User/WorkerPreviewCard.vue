@@ -14,7 +14,7 @@
         v-for="type in worker.user_task_types"
         :key="type._id"
         :label="type.taskName"
-        primaryColor="EA4B44"
+        :primaryColor="type.color ?? '#EA4B44'"
         class="text-sm p-0"
       />
       <p v-if="worker.inProgressTasks.length > 0" class="text-sm text-gray-500">

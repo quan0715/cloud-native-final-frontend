@@ -4,9 +4,10 @@ export const useUserData = () => {
   if (!token) {
     throw new Error('未登入，請先登入')
   }
-  const decodedToken = jwtDecode(token) as { id: string; role: string }
-  const username = decodedToken.id
-  const roleLabel = decodedToken.role
+  const decodedToken = jwtDecode(token) as { id: string; role: string; userName: string }
+  const username = decodedToken.userName
+  const userId = decodedToken.id
+  const userRole = decodedToken.role
 
-  return { username, userId: decodedToken.id, roleLabel }
+  return { username, userId, userRole }
 }

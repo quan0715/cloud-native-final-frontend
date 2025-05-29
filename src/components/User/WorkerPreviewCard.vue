@@ -1,15 +1,15 @@
 <template>
-  <Card class="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
-    <div>
-      <div id="task-header" class="flex flex-col justify-start items-start gap-1.5">
-        <StatusBadge :label="status.label" :status="status.status" />
-        <p class="text-xl font-thin px-1">{{ worker.userName }}</p>
-      </div>
-      <p v-if="worker.inProgressTasks.length > 0" class="text-xs text-gray-500">
-        正在進行 {{ worker.inProgressTasks }}
-      </p>
-      <!-- TODO: 加上 user_task_types 的數量 -->
-      <Separator orientation="horizontal" class="w-full" />
+  <Card
+    class="w-full flex flex-col justify-start items-start gap-2 p-4 bg-white rounded-lg shadow-sm"
+  >
+    <div id="task-header" class="flex flex-col justify-start items-start gap-2">
+      <StatusBadge :label="status.label" :status="status.status" />
+      <p class="text-xl font-thin px-1">{{ worker.userName }}</p>
+    </div>
+
+    <!-- TODO: 加上 user_task_types 的數量 -->
+    <Separator orientation="horizontal" class="w-full" />
+    <div class="w-full flex flex-col justify-start items-start gap-2">
       <ColorBadge
         v-for="type in worker.user_task_types"
         :key="type._id"
@@ -17,6 +17,9 @@
         primaryColor="EA4B44"
         class="text-sm p-0"
       />
+      <p v-if="worker.inProgressTasks.length > 0" class="text-sm text-gray-500">
+        正在進行 {{ worker.inProgressTasks[0].taskName }}
+      </p>
     </div>
   </Card>
 </template>
@@ -25,6 +28,7 @@
 import Card from '@/components/ui/card/Card.vue'
 import { type UserWithTasks } from '@/types/user'
 import { computed } from 'vue'
+import { Separator } from '@/components/ui/separator'
 import StatusBadge from '@/components/StatusBadge.vue'
 import ColorBadge from '@/components/ColorBadge.vue'
 
@@ -34,7 +38,7 @@ console.log('worker', worker)
 const status = computed(() => {
   if (worker.inProgressTasks.length > 0) {
     return {
-      label: '作業中',
+      label: `作業中 - ${worker.inProgressTasks[0].taskName}`,
       status: 'in-progress',
     }
   }

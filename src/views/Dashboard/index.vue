@@ -64,6 +64,29 @@
         />
       </div>
       <Separator orientation="horizontal" />
+      <div class="w-full flex flex-row justify-between items-center gap-2">
+        <h1 class="w-fit text-3xl font-thin">已完成任務</h1>
+      </div>
+      <div class="w-full grid grid-cols-3 gap-4 h-full">
+        <TaskCard
+          v-for="task in tasks.filter((t: Task) => t.taskData.state === 'success')"
+          :key="task._id"
+          :task="task"
+          class="w-full h-auto flex-1"
+        />
+      </div>
+      <Separator orientation="horizontal" />
+      <div class="w-full flex flex-row justify-between items-center gap-2">
+        <h1 class="w-fit text-3xl font-thin">已放棄任務</h1>
+      </div>
+      <div class="w-full grid grid-cols-3 gap-4 h-full">
+        <TaskCard
+          v-for="task in tasks.filter((t: Task) => t.taskData.state === 'fail')"
+          :key="task._id"
+          :task="task"
+          class="w-full h-auto flex-1"
+        />
+      </div>
     </div>
   </div>
   <TaskFormDialog
@@ -117,10 +140,11 @@ const draftTask = computed(() => {
 
 const uncompletedTask = computed(() => {
   return tasks.value.filter(
-    (t: Task) => t.taskData.state != 'draft' && t.taskData.state != 'success',
+    (t: Task) =>
+      t.taskData.state != 'draft' && t.taskData.state != 'success' && t.taskData.state != 'fail',
   )
 })
-const totalTasks = computed(() => tasks.value.length)
+const totalTasks = computed(() => draftCount.value + uncompletedTaskCount.value)
 
 const draftCount = computed(() => draftTask.value.length)
 const uncompletedTaskCount = computed(() => uncompletedTask.value.length)

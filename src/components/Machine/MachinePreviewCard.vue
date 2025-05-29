@@ -32,7 +32,7 @@ const { machine } = defineProps<{ machine: Machine }>()
 
 const status = computed(() => {
   switch (machine.status) {
-    case 'in-progress':
+    case 'in-use':
       return {
         label: '作業中',
         status: 'in-progress',

@@ -8,7 +8,10 @@
         <UserWeaklyReview class="col-span-1" :total="totalTasks" :completed="completedTasks" />
         <InprogressTaskCard
           class="col-span-2"
-          :inprogress-task="userTasks?.inProgressTasks || []"
+          :inprogress-task="inprogressTask"
+          @taskStarted="fetchWorker"
+          @taskCompleted="fetchWorker"
+          @taskFailed="fetchWorker"
         />
       </div>
       <Separator />
@@ -58,6 +61,10 @@ async function fetchWorker() {
 onMounted(fetchWorker)
 
 /* ---------------- 統計數量 (computed) ---------------- */
+const inprogressTask = computed(() => {
+  if (!userTasks.value?.inProgressTasks) return null
+  return userTasks.value.inProgressTasks[0]
+})
 const totalTasks = computed(() => {
   const u = userTasks.value
   if (!u) return -1

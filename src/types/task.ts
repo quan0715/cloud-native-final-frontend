@@ -4,6 +4,7 @@ export interface TaskType {
   _id: ObjectId
   taskName: string // 顯示名稱
   number_of_machine: number // 需要幾台機器
+  color?: string // 任務類型顏色
   createdAt: ISODate
   updatedAt: ISODate
   __v?: number // Mongoose 版本號，可忽略
@@ -16,7 +17,7 @@ export interface TaskData {
   /** 被指派者；draft 時為 null */
   assignee_id: { _id: ObjectId; userName: string } | null
   /** 機器陣列；尚未指派前為 [] */
-  machine: ObjectId[]
+  machine: { _id: ObjectId; machineName: string }[]
   /** 指派時間 */
   assignTime: ISODate | null
   /** 任務開始/結束時間 */

@@ -28,7 +28,7 @@ export interface TaskSnapshot {
   _id: ObjectId
   taskName: string
   state: TaskSnapshotState
-  taskType?: { taskName: string }
+  taskType?: { taskName: string; color?: string }
   machine?: { machineName: string }[]
 }
 

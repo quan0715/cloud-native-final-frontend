@@ -124,3 +124,46 @@ export async function autoAssignTasks(assignerId: string, previewAssignments: Au
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
   return response.json()
 }
+
+export async function startNext(workerId: string) {
+  try {
+    const res = await fetch(`${taskEndPoint}/start-next`, {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        workerId: workerId,
+      }),
+      method: 'PATCH',
+    })
+    if (!res.ok) {
+      const errorBody = await res.json()
+      throw new Error(`startNext 錯誤: ${errorBody.error}`)
+    }
+    return (await res.json()) as Task
+  } catch (e) {
+    throw e
+  }
+}
+
+export async function finishTask(taskId: string) {
+  const response = await fetch(`${taskEndPoint}/${taskId}/complete`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!response.ok) {
+    const errorBody = await response.json()
+    if (errorBody.error) {
+      throw new Error(`${errorBody.error}`)
+    }
+    throw new Error(`finishTask 錯誤: ${response.status}`)
+  }
+  return response.json()
+}
+
+export async function failToFinishTask(taskId: string) {
+  const response = await fetch(`${taskEndPoint}/${taskId}/fail`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  return response.json()
+}

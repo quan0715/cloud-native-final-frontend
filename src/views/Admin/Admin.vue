@@ -2,7 +2,7 @@
   <div class="flex flex-col justify-center items-center p-12">
     <div class="max-w-screen-lg w-full flex flex-col justify-start items-start gap-4">
       <h1 class="w-fit text-3xl font-thin">
-        <span class="text-blue-600">LAB 11</span> / QUAN / {{ currentTab }}
+        <span class="text-blue-600">LAB 11</span> / {{ username }} / {{ currentTab }}
       </h1>
       <DashboardCard title="Admin Dashboard" class="w-full">
         <Tabs v-model="currentTab" class="w-full p-0 m-0">
@@ -55,6 +55,10 @@ import TaskTypeManageTab from '@/views/Admin/TaskTypeManageTab.vue'
 import UserManageTab from '@/views/Admin/UserManageTab.vue'
 import type { Ref } from 'vue'
 import { inject, ref } from 'vue'
+import { useUserData } from '@/composables/useUserData'
+
+const { username } = useUserData()
+
 const currentTab = ref('使用者管理')
 const tabTriggerClass = 'w-full px-4 py-2'
 

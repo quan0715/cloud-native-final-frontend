@@ -11,16 +11,26 @@
       </div>
       <Separator orientation="horizontal" class="w-full" />
       <div class="w-full flex flex-col justify-start items-start gap-2">
-        <ColorBadge :label="task.taskTypeId.taskName" primaryColor="EA4B44" class="text-sm" />
-        <p class="text-xs text-gray-500">
+        <ColorBadge
+          :label="task.taskTypeId.taskName"
+          :primaryColor="task.taskTypeId.color || '#3B82F6'"
+          class="text-sm"
+        />
+        <p class="text-sm text-gray-500">
           <span v-if="task.taskData.state === 'assigned'">
             已指派給 - {{ task.taskData.assignee_id?.userName || '未知' }}
           </span>
-          <span v-else> {{ task.assigner_id?.userName || '未知' }} 正在操作 </span>
+          <span v-if="task.taskData.state === 'in-progress'">
+            {{ task.taskData.assignee_id?.userName || '未知' }} 正在操作
+            {{ (task.taskData.machine ?? []).map((machine) => machine.machineName).join(' | ') }}
+          </span>
+          <span v-if="task.taskData.state === 'success'">
+            {{ task.taskData.assignee_id?.userName || '未知' }} 完成任務
+          </span>
+          <span v-if="task.taskData.state === 'fail'">
+            {{ task.taskData.assignee_id?.userName || '未知' }} 已放棄任務
+          </span>
         </p>
-        <div class="flex flex-row justify-start items-center gap-2">
-          <p v-for="machine in task.taskData.machine" :key="machine">{{ machine }}</p>
-        </div>
       </div>
     </div>
     <!-- <Button
@@ -72,6 +82,15 @@ const taskState = computed(() => {
         status: 'in-progress',
       }
     case 'success':
+      return {
+        label: '完成',
+        status: 'success',
+      }
+    case 'fail':
+      return {
+        label: '失敗',
+        status: 'error',
+      }
     default:
       return {
         label: '未知',

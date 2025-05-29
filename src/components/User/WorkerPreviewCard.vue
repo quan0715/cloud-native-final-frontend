@@ -8,13 +8,15 @@
       <p v-if="worker.inProgressTasks.length > 0" class="text-xs text-gray-500">
         正在進行 {{ worker.inProgressTasks }}
       </p>
-      <!-- <ColorBadge
+      <!-- TODO: 加上 user_task_types 的數量 -->
+      <Separator orientation="horizontal" class="w-full" />
+      <ColorBadge
         v-for="type in worker.user_task_types"
         :key="type._id"
         :label="type.taskName"
-        primaryColor="F8A608"
+        primaryColor="EA4B44"
         class="text-sm p-0"
-      /> -->
+      />
     </div>
   </Card>
 </template>
@@ -27,6 +29,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import ColorBadge from '@/components/ColorBadge.vue'
 
 const { worker } = defineProps<{ worker: UserWithTasks }>()
+console.log('worker', worker)
 
 const status = computed(() => {
   if (worker.inProgressTasks.length > 0) {

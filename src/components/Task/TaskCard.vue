@@ -1,13 +1,26 @@
 <template>
   <Card class="flex justify-between items-center p-4 rounded-xl shadow-sm group">
-    <div class="flex flex-col justify-start items-start gap-2">
-      <!-- 任務標題 -->
-      <div id="task-header" class="flex flex-col justify-start items-start gap-1">
+    <div class="w-full flex flex-col justify-start items-start gap-4">
+      <div id="task-header" class="flex flex-col justify-start items-start gap-2">
         <StatusBadge :label="taskState.label" :status="taskState.status" />
 
-        <p class="text-xl font-thin px-1">{{ task.taskName }}</p>
+        <div class="flex flex-row justify-start items-center gap-2">
+          <p class="text-xl font-thin">{{ task.taskName }}</p>
+        </div>
       </div>
-      <ColorBadge :label="task.taskTypeId.taskName" primaryColor="EA4B44" class="text-sm" />
+      <Separator orientation="horizontal" class="w-full" />
+      <div class="w-full flex flex-col justify-start items-start gap-2">
+        <ColorBadge :label="task.taskTypeId.taskName" primaryColor="EA4B44" class="text-sm" />
+        <p class="text-xs text-gray-500">
+          <span v-if="task.taskData.state === 'assigned'">
+            已指派給 - {{ task.taskData.assignee_id?.userName || '未知' }}
+          </span>
+          <span v-else> {{ task.assigner_id?.userName || '未知' }} 正在操作 </span>
+        </p>
+        <div class="flex flex-row justify-start items-center gap-2">
+          <p v-for="machine in task.taskData.machine" :key="machine">{{ machine }}</p>
+        </div>
+      </div>
     </div>
     <!-- <Button
       variant="ghost"
@@ -32,10 +45,13 @@ import type { Task } from '@/types/task'
 import ColorBadge from '@/components/ColorBadge.vue'
 import Card from '@/components/ui/card/Card.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import { Separator } from '@/components/ui/separator'
 
 const { task } = defineProps<{
   task: Task
 }>()
+
+console.log('task', task)
 
 const taskState = computed(() => {
   switch (task.taskData.state) {

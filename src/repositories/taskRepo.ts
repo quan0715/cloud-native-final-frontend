@@ -58,9 +58,9 @@ export async function createTask(task: CreateTask) {
   }
 }
 
-export async function updateTask(taskId: string, taskData: Partial<CreateTask>) {
+export async function updateDraftTask(taskId: string, taskData: Partial<CreateTask>) {
   try {
-    const response = await fetch(`${taskEndPoint}/${taskId}`, {
+    const response = await fetch(`${taskEndPoint}/${taskId}/update-draft`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(taskData),

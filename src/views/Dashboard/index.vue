@@ -28,7 +28,7 @@
           v-for="task in draftTask"
           :key="task._id"
           :task="task"
-          class="w-full h-auto flex-1"
+          @update="syncRemoteTasks"
         />
       </div>
       <Separator orientation="horizontal" />
@@ -69,8 +69,9 @@
   <TaskFormDialog
     v-model:modelValue="isDialogVisible"
     :taskToEdit="currentTaskToEdit"
-    @taskSaved="handleTaskSavedOrDeleted"
-    @taskDeleted="handleTaskSavedOrDeleted"
+    :syncRemoteTasks="syncRemoteTasks"
+    @taskSaved="syncRemoteTasks"
+    @taskDeleted="syncRemoteTasks"
   />
   <AutoAssignSheet
     :open="isAutoAssignDrawerOpen"
@@ -110,22 +111,6 @@ const tasks = ref<Task[]>([]) // 您的任務列表數據
 const isAutoAssignDrawerOpen = ref(false)
 const { userId } = useUserData()
 
-function openNewTaskDialog() {
-  currentTaskToEdit.value = null
-  isDialogVisible.value = true
-}
-
-async function handleTaskSavedOrDeleted() {
-  isDialogVisible.value = false // 關閉對話框
-  await fetchAllTasks()
-  console.log('Task saved or deleted, draft tasks list refreshed.')
-}
-
-const totalTasks = computed(() => tasks.value.length)
-
-const draftCount = computed(() => draftTask.value.length)
-const uncompletedTaskCount = computed(() => uncompletedTask.value.length)
-
 const draftTask = computed(() => {
   return tasks.value.filter((t: Task) => t.taskData.state === 'draft')
 })
@@ -135,8 +120,26 @@ const uncompletedTask = computed(() => {
     (t: Task) => t.taskData.state != 'draft' && t.taskData.state != 'success',
   )
 })
+const totalTasks = computed(() => tasks.value.length)
+
+const draftCount = computed(() => draftTask.value.length)
+const uncompletedTaskCount = computed(() => uncompletedTask.value.length)
 
 const error = ref<string | null>(null)
+
+function openNewTaskDialog() {
+  currentTaskToEdit.value = null
+  isDialogVisible.value = true
+}
+
+function openAutoAssignDrawer() {
+  isAutoAssignDrawerOpen.value = true
+}
+
+async function syncRemoteTasks() {
+  isDialogVisible.value = false // 關閉對話框
+  await fetchAllTasks()
+}
 
 async function fetchWorkers() {
   loading.value = true
@@ -170,10 +173,6 @@ async function fetchAllTasks() {
   loading.value = true
   tasks.value = (await getAllTasksFromRepo()) as Task[]
   loading.value = false
-}
-
-function openAutoAssignDrawer() {
-  isAutoAssignDrawerOpen.value = true
 }
 
 async function handleAssignmentsConfirmed() {

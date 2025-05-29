@@ -31,6 +31,7 @@ export interface TaskSnapshot {
   taskType?: { taskName: string }
   machine?: { machineName: string }[]
 }
+
 export type TaskSnapshotState = 'assigned' | 'in-progress' | 'success' | 'fail'
 
 export interface UserWithTasks {

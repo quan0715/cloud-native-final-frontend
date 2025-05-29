@@ -11,16 +11,11 @@
       </div>
       <Separator orientation="horizontal" class="w-full" />
       <div class="w-full flex flex-col justify-start items-start gap-2">
-        <ColorBadge :label="task.taskTypeId.taskName" primaryColor="EA4B44" class="text-sm" />
-        <p class="text-xs text-gray-500">
-          <span v-if="task.taskData.state === 'assigned'">
-            已指派給 - {{ task.taskData.assignee_id?.userName || '未知' }}
-          </span>
-          <span v-else> {{ task.assigner_id?.userName || '未知' }} 正在操作 </span>
-        </p>
-        <div class="flex flex-row justify-start items-center gap-2">
-          <p v-for="machine in task.taskData.machine" :key="machine">{{ machine }}</p>
-        </div>
+        <ColorBadge
+          :label="task.taskType?.taskName || '未知'"
+          primaryColor="EA4B44"
+          class="text-sm"
+        />
       </div>
     </div>
     <!-- <Button
@@ -42,25 +37,20 @@
 
 <script setup lang="ts">
 import { defineProps, computed } from 'vue'
-import type { Task } from '@/types/task'
+import type { TaskSnapshot } from '@/types/user'
 import ColorBadge from '@/components/ColorBadge.vue'
 import Card from '@/components/ui/card/Card.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { Separator } from '@/components/ui/separator'
 
 const { task } = defineProps<{
-  task: Task
+  task: TaskSnapshot
 }>()
 
 console.log('task', task)
 
 const taskState = computed(() => {
-  switch (task.taskData.state) {
-    case 'draft':
-      return {
-        label: '草稿',
-        status: 'draft',
-      }
+  switch (task.state) {
     case 'assigned':
       return {
         label: '已指派',

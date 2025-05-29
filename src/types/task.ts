@@ -14,7 +14,7 @@ export type TaskState = 'draft' | 'assigned' | 'in-progress' | 'success' | 'fail
 export interface TaskData {
   state: TaskState
   /** 被指派者；draft 時為 null */
-  assignee_id: ObjectId | null
+  assignee_id: { _id: ObjectId; userName: string } | null
   /** 機器陣列；尚未指派前為 [] */
   machine: ObjectId[]
   /** 指派時間 */

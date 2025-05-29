@@ -37,7 +37,7 @@ import TaskFormDialog from '@/views/Dashboard/TaskFormDialog.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { ref } from 'vue'
 
-const emit = defineEmits(['on-task-update'])
+const emit = defineEmits(['update'])
 
 const isDialogVisible = ref(false)
 const currentTaskToEdit = ref<Task | null>(null)
@@ -49,7 +49,7 @@ function openEditTaskDialog(task: Task) {
 
 function handleTaskUpdate() {
   isDialogVisible.value = false
-  emit('on-task-update')
+  emit('update')
 }
 
 const { task } = defineProps<{

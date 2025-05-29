@@ -2,7 +2,7 @@ import MainLayout from '@/layouts/MainLayout.vue'
 import DashboardView from '@/views/Dashboard/index.vue'
 import Task from '@/views/Task/Task.vue'
 import Admin from '@/views/Admin/Admin.vue'
-import Login from '@/views/Login.vue'
+import LoginView from '@/views/LoginView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { jwtDecode } from 'jwt-decode'
 import { useToast } from '@/components/ui/toast/use-toast'
@@ -17,7 +17,7 @@ interface DecodedToken {
 const routes = [
   {
     path: '/login',
-    component: Login,
+    component: LoginView,
   },
   {
     path: '/',

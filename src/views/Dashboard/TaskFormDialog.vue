@@ -83,7 +83,7 @@ import {
 } from '@/components/ui/select'
 import { onMounted, ref, computed, watch } from 'vue'
 import type { TaskType, Task } from '@/types/task'
-import { fetchTaskTypes, createTask, updateTask, deleteTask } from '@/repositories/taskRepo'
+import { fetchTaskTypes, createTask, updateDraftTask, deleteTask } from '@/repositories/taskRepo'
 import { toast } from '@/components/ui/toast/use-toast'
 import {
   AlertDialog,
@@ -184,7 +184,7 @@ async function handleSubmit() {
     }
 
     if (isEditMode.value && props.taskToEdit) {
-      await updateTask(props.taskToEdit._id, taskData)
+      await updateDraftTask(props.taskToEdit._id, taskData)
       toast({
         title: '更新任務成功',
         description: `任務 ${createName.value} 已更新`,
@@ -196,8 +196,8 @@ async function handleSubmit() {
         description: `任務 ${createName.value} (${taskType.value.find((t) => t._id === createTypeId.value)?.taskName})已新增`,
       })
     }
-
     emit('taskSaved')
+
     resetForm()
     emit('update:modelValue', false)
   } catch (error) {

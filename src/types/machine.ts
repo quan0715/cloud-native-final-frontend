@@ -1,4 +1,3 @@
-
 import type { ISODate, ObjectId } from './base'
 import type { TaskType } from './task'
 
@@ -10,8 +9,7 @@ export enum MachineStatus {
   Assigned = '已指派',
 }
 
-
-export type MachineState = 'in-progress' | 'idle' | 'maintenance' | 'assigned'
+export type MachineState = 'in-use' | 'idle' | 'maintenance' | 'assigned'
 
 export interface Machine {
   _id: ObjectId

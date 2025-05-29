@@ -1,24 +1,3 @@
-<script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useLogin } from '@/composables/useLogin'
-import { ArrowRight, Loader2 } from 'lucide-vue-next'
-import { ref } from 'vue'
-
-const username = ref('')
-const password = ref('')
-const envTag = import.meta.env.VITE_ENV_TAG
-const { login, isLogin } = useLogin()
-
-async function handleLogin() {
-  await login({
-    userName: username.value,
-    password: password.value,
-  })
-}
-</script>
-
 <template>
   <div
     class="min-h-screen w-full bg-cover bg-center flex items-center justify-end"
@@ -52,3 +31,23 @@ async function handleLogin() {
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useLogin } from '@/composables/useLogin'
+import { ArrowRight, Loader2 } from 'lucide-vue-next'
+import { ref } from 'vue'
+
+const username = ref('')
+const password = ref('')
+const envTag = import.meta.env.VITE_ENV_TAG
+const { login, isLogin } = useLogin()
+
+async function handleLogin() {
+  await login({
+    userName: username.value,
+    password: password.value,
+  })
+}
+</script>

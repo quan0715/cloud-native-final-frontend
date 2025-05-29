@@ -5,7 +5,7 @@
       <span class="text-blue-600">{{ $route.meta.title }}</span>
     </h1>
     <div class="flex items-center gap-4 h-[48px]">
-      <UserHeader :username="username" lab-name="lab11" :role-label="roleLabel" @logout="logout" />
+      <UserHeader :username="username" lab-name="lab11" :role-label="userRole" @logout="logout" />
     </div>
   </div>
 </template>
@@ -15,7 +15,7 @@ import UserHeader from '@/components/User/UserHeader.vue'
 import { useLogout } from '@/composables/useLogout'
 import { useUserData } from '@/composables/useUserData'
 const { logout } = useLogout()
-const { username, roleLabel } = useUserData()
+const { username, userRole } = useUserData()
 
 const envTag = import.meta.env.VITE_ENV_TAG
 </script>

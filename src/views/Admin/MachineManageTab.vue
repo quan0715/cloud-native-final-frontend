@@ -1,5 +1,58 @@
 <template>
   <DashboardCard title="實驗室機器管理" class="w-full">
+    <template #action>
+      <Dialog v-model:open="createOpen">
+        <!-- 觸發按鈕 -->
+        <DialogTrigger as-child>
+          <Button variant="outline">
+            <div class="flex items-center gap-2">
+              <Plus class="w-4 h-4" />
+              新增機器
+            </div>
+          </Button>
+        </DialogTrigger>
+
+        <!-- 表單內容 -->
+        <DialogContent class="max-w-md">
+          <DialogHeader>
+            <DialogTitle>新增機器</DialogTitle>
+          </DialogHeader>
+
+          <div class="space-y-4">
+            <!-- 任務複選 -->
+            <div>
+              <Label class="mb-1 block">機器負責任務項目（可複選）</Label>
+              <div
+                v-for="t in taskTypes"
+                :key="t._id"
+                class="flex items-center gap-2"
+              >
+                <Checkbox
+                  :model-value="createTaskIds.includes(t._id)"
+                  @update:model-value="toggleCreateTask(t._id)"
+                />
+                <span>{{ t.taskName }}</span>
+              </div>
+            </div>
+
+            <!-- 機器名稱 -->
+            <div>
+              <Label class="mb-1 block">輸入機器名稱</Label>
+              <Input v-model="createName" placeholder="機器名稱" />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose as-child>
+              <Button variant="secondary" @click="resetCreate">取消</Button>
+            </DialogClose>
+            <DialogClose as-child>
+              <Button @click="submitCreate">確定</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </template>
     <div class="flex flex-col gap-2">
       <div
         v-for="m in machines"
@@ -119,8 +172,9 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import type { Machine } from '@/types/machine'
 import type { TaskType } from '@/types/task'
-import { Edit, Trash } from 'lucide-vue-next'
+import { Edit, Plus, Trash } from 'lucide-vue-next'
 import { defineEmits, defineProps, ref } from 'vue'
+
 
 /* -------- props & emits -------- */
 const props = defineProps<{
@@ -133,6 +187,8 @@ const emit = defineEmits<{
   (e: 'update', payload: { _id: string; machineName: string; taskIds: string[] }): void
   /** 刪除 */
   (e: 'delete', id: string): void
+  /** 新增機器 */
+  (e: 'create', payload: { machineName: string; taskIds: string[] }): void
 }>()
 
 /* -------- 編輯表單狀態 -------- */
@@ -155,6 +211,7 @@ function saveEdit(id: string) {
   closeEdit()
 }
 function toggleTask(id: string) {
+  console.log('toggleTask', id)
   if (editTaskIds.value.includes(id)) {
     editTaskIds.value = editTaskIds.value.filter((t) => t !== id)
   } else {
@@ -165,6 +222,34 @@ function openEdit(machine: Machine) {
   editName.value    = machine.machineName
   // 先取出 _id 陣列放進 editTaskIds
   editTaskIds.value = machine.machine_task_types.map((t) => t._id)
+}
+
+const createOpen   = ref(false)
+const createName   = ref('')
+const createTaskIds = ref<string[]>([])
+
+function resetCreate() {
+  createName.value = ''
+  createTaskIds.value = []
+}
+
+/* 勾選 / 取消 checkbox */
+function toggleCreateTask(id: string) {
+  console.log('toggleTask', id)
+  if (createTaskIds.value.includes(id)) {
+    createTaskIds.value = createTaskIds.value.filter((t) => t !== id)
+  } else {
+    createTaskIds.value.push(id)
+  }
+}
+
+/* 提交新增 */
+function submitCreate() {
+  emit('create', {
+    machineName: createName.value,
+    taskIds: createTaskIds.value,
+  })
+  resetCreate()
 }
 </script>
 

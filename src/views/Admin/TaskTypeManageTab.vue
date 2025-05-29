@@ -1,25 +1,73 @@
 <template>
   <DashboardCard title="任務類型管理" class="w-full">
+    <template #action>
+      <Dialog v-model:open="createOpen">
+        <DialogTrigger as-child>
+          <Button variant="outline">
+            <div class="flex items-center gap-2">
+              <Plus class="w-4 h-4" />
+              新增任務類型
+            </div>
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent class="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>新增任務類型</DialogTitle>
+          </DialogHeader>
+
+          <div class="space-y-4">
+            <!-- 任務名稱 -->
+            <div>
+              <Label class="mb-1 block">任務名稱</Label>
+              <Input v-model="createName" placeholder="如：電性測試" />
+            </div>
+
+            <!-- 所需機台數 -->
+            <div>
+              <Label class="mb-1 block">所需機台數</Label>
+              <Input type="number" min="1" v-model.number="createNum" />
+            </div>
+
+            <!-- 顏色選擇 -->
+            <ColorPicker v-model="createColor" label="任務類型顏色" />
+            <div class="flex items-center gap-2">
+              <Label class="text-sm text-gray-600">標籤預覽</Label>
+              <ColorBadge :label="createName" :primaryColor="createColor" />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose as-child>
+              <Button variant="secondary" @click="resetCreate">取消</Button>
+            </DialogClose>
+            <DialogClose as-child>
+              <Button @click="submitCreate">確定</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </template>
+
     <div class="flex flex-col gap-2">
-      <div
-        v-for="t in taskTypes"
-        :key="t._id"
-        class="flex flex-col gap-2"
-      >
+      <div v-for="t in taskTypes" :key="t._id" class="flex flex-col gap-2">
         <div class="flex items-stretch gap-4 border-2 border-gray-200 p-4 rounded-xl">
           <!-- 任務基本資訊 -->
           <div class="flex flex-col gap-1 min-w-48">
             <p class="text-sm text-gray-500">ID: {{ t._id }}</p>
-            <p class="text-xl font-semibold">{{ t.taskName }}</p>
+            <div class="flex items-center gap-2">
+              <div
+                class="w-4 h-4 rounded-full border border-gray-300"
+                :style="{ backgroundColor: t.color || '#64748B' }"
+              ></div>
+              <p class="text-xl font-semibold">{{ t.taskName }}</p>
+            </div>
           </div>
 
           <Separator orientation="vertical" class="h-auto" />
 
           <!-- 所需機台數 -->
-          <DashboardData
-            title="所需機台數"
-            :content="t.number_of_machine.toString()"
-          />
+          <DashboardData title="所需機台數" :content="t.number_of_machine.toString()" />
 
           <Separator orientation="vertical" class="h-auto" />
 
@@ -46,11 +94,14 @@
 
                   <div>
                     <Label class="mb-1 block">所需機台數</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      v-model.number="editNum "
-                    />
+                    <Input type="number" min="1" v-model.number="editNum" />
+                  </div>
+
+                  <!-- 顏色選擇 -->
+                  <ColorPicker v-model="editColor" label="任務類型顏色" />
+                  <div class="flex items-center gap-2">
+                    <Label class="text-sm text-gray-600">標籤預覽</Label>
+                    <ColorBadge :label="editName" :primaryColor="editColor" />
                   </div>
                 </div>
 
@@ -77,17 +128,12 @@
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>確定刪除？</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    刪除後將無法恢復。
-                  </AlertDialogDescription>
+                  <AlertDialogDescription> 刪除後將無法恢復。 </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
                   <AlertDialogCancel>取消</AlertDialogCancel>
-                  <AlertDialogAction
-                    class="bg-red-600 text-white"
-                    @click="emit('delete', t._id)"
-                  >
+                  <AlertDialogAction class="bg-red-600 text-white" @click="emit('delete', t._id)">
                     確定
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -102,8 +148,8 @@
 
 <script setup lang="ts">
 /* --- imports -------------------------------------------------------- */
-import DashboardCard from '@/components/DashboardCard.vue';
-import DashboardData from '@/components/DashboardData.vue';
+import DashboardCard from '@/components/DashboardCard.vue'
+import DashboardData from '@/components/DashboardData.vue'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -111,35 +157,52 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogHeader, AlertDialogTitle,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog/'; // barrel 匯出路徑依專案調整
-import Button from '@/components/ui/button/Button.vue';
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui/alert-dialog/' // barrel 匯出路徑依專案調整
+import Button from '@/components/ui/button/Button.vue'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-import { Separator } from '@/components/ui/separator';
-import type { TaskType } from '@/types/task';
-import { Edit, Trash } from 'lucide-vue-next';
-import { defineEmits, defineProps, ref } from 'vue';
+import { Separator } from '@/components/ui/separator'
+import type { TaskType } from '@/types/task'
+import { Edit, Plus, Trash } from 'lucide-vue-next'
+import { defineEmits, defineProps, ref } from 'vue'
+import ColorPicker from '@/components/ui/ColorPicker.vue'
+import ColorBadge from '@/components/ColorBadge.vue'
 
 /* --- props & emit --------------------------------------------------- */
-const props = defineProps<{ taskTypes: TaskType[] }>()
+defineProps<{ taskTypes: TaskType[] }>()
 
 const emit = defineEmits<{
-  (e: 'update', payload: { _id: string; taskName: string; number_of_machine: number }): void
+  (
+    e: 'update',
+    payload: { _id: string; taskName: string; number_of_machine: number; color?: string },
+  ): void
   (e: 'delete', id: string): void
+  (e: 'create', payload: { taskName: string; number_of_machine: number; color?: string }): void
 }>()
 
 /* --- local edit state ---------------------------------------------- */
 const editName = ref('')
-const editNum  = ref<number>(0)
+const editNum = ref<number>(0)
+const editColor = ref('#3B82F6')
 
 /* 重設表單 */
 function resetEdit() {
   editName.value = ''
-  editNum.value  = 0
+  editNum.value = 0
+  editColor.value = '#3B82F6'
 }
 
 /* 發送更新事件給父層 */
@@ -149,12 +212,35 @@ function saveEdit(id: string) {
     _id: id,
     taskName: editName.value,
     number_of_machine: editNum.value,
+    color: editColor.value,
   })
   resetEdit()
 }
 function openEdit(t: TaskType) {
   editName.value = t.taskName
-  editNum.value  = t.number_of_machine
+  editNum.value = t.number_of_machine
+  editColor.value = t.color || '#3B82F6'
   console.log('openEdit', t._id, t.taskName, t.number_of_machine)
+}
+
+const createOpen = ref(false)
+const createName = ref('')
+const createNum = ref<number>(0)
+const createColor = ref('#3B82F6')
+
+function resetCreate() {
+  createName.value = ''
+  createNum.value = 0
+  createColor.value = '#3B82F6'
+}
+
+function submitCreate() {
+  if (!createName.value || !createNum.value) return
+  emit('create', {
+    taskName: createName.value,
+    number_of_machine: createNum.value,
+    color: createColor.value,
+  })
+  resetCreate()
 }
 </script>

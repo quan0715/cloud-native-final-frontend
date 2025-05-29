@@ -10,13 +10,15 @@
     <!-- TODO: 加上 user_task_types 的數量 -->
     <Separator orientation="horizontal" class="w-full" />
     <div class="w-full flex flex-col justify-start items-start gap-2">
-      <ColorBadge
-        v-for="type in worker.user_task_types"
-        :key="type._id"
-        :label="type.taskName"
-        :primaryColor="type.color ?? '#EA4B44'"
-        class="text-sm p-0"
-      />
+      <div class="flex flex-wrap gap-1">
+        <ColorBadge
+          v-for="type in worker.user_task_types"
+          :key="type._id"
+          :label="type.taskName"
+          :primaryColor="type.color ?? '#EA4B44'"
+          class="text-sm p-0"
+        />
+      </div>
       <p v-if="worker.inProgressTasks.length > 0" class="text-sm text-gray-500">
         正在進行 {{ worker.inProgressTasks[0].taskName }}
       </p>

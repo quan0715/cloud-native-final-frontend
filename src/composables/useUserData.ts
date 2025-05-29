@@ -8,6 +8,6 @@ export const useUserData = () => {
   const username = decodedToken.userName
   const userId = decodedToken.id
   const userRole = decodedToken.role
-
+  console.log(decodedToken)
   return { username, userId, userRole }
 }

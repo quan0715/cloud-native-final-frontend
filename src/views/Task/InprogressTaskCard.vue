@@ -3,8 +3,8 @@
     <div v-if="inprogressTask !== null">
       <div :key="inprogressTask._id" class="flex flex-col justify-start items-start gap-2 p-2">
         <ColorBadge
-          :label="inprogressTask.taskType?.taskName"
-          :primaryColor="inprogressTask.taskType?.color || 'purple'"
+          :label="inprogressTask.taskType?.taskName ?? '未知'"
+          :primaryColor="inprogressTask.taskType?.color ?? 'purple'"
           class="text-sm"
         />
         <p class="text-xl text-sans font-semibold text-gray-600">

@@ -12,7 +12,7 @@
           v-for="type in machine.machine_task_types"
           :key="type._id"
           :label="type.taskName"
-          primaryColor="EA4B44"
+          :primaryColor="type.color ?? '#EA4B44'"
           class="text-sm p-0"
         />
       </div>

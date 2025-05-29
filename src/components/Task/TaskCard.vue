@@ -74,7 +74,7 @@ const taskState = computed(() => {
     case 'assigned':
       return {
         label: '已指派',
-        status: 'in-progress',
+        status: 'draft',
       }
     case 'in-progress':
       return {

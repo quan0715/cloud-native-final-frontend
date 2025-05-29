@@ -56,7 +56,13 @@ import UserManageTab from '@/views/Admin/UserManageTab.vue'
 import type { Ref } from 'vue'
 import { inject, ref } from 'vue'
 import { useUserData } from '@/composables/useUserData'
-
+import {
+  fetchTaskTypes as fetchTaskTypesRepo,
+  createTaskType as createTaskTypeRepo,
+  updateTaskType as updateTaskTypeRepo,
+  deleteTaskType as deleteTaskTypeRepo,
+} from '@/repositories/taskRepo'
+import type { CreateTaskType } from '@/types/taskType'
 const { username } = useUserData()
 
 const currentTab = ref('使用者管理')
@@ -111,15 +117,9 @@ async function fetchTaskTypes() {
   loading.value = true
   error.value = null
   try {
-    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
-    const res = await fetch(`${base}/task-types`, {
-      // 若後端要帶 cookie
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    taskTypes.value = (await res.json()) as TaskType[]
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
+    taskTypes.value = await fetchTaskTypesRepo()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Unknown error'
   } finally {
     loading.value = false
   }
@@ -164,38 +164,29 @@ const handleMachineUpdate = async (payload: {
 }
 
 const handleTaskTypeDelete = async (id: string) => {
-  const base = import.meta.env.VITE_API_BASE_URL
-  const res = await fetch(`${base}/task-types/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  else {
-    await fetchTaskTypes()
-    console.log('deleted task type:', id)
-  }
+  await deleteTaskTypeRepo(id)
+  await fetchTaskTypes()
+  console.log('deleted task type:', id)
 }
 
-const handleTaskTypeUpdate = async (payload: {
-  _id: string
-  taskName: string
-  number_of_machine: number
-}) => {
-  console.log(payload)
-  const base = import.meta.env.VITE_API_BASE_URL
-  const res = await fetch(`${base}/task-types/${payload._id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      taskName: payload.taskName,
-      number_of_machine: payload.number_of_machine,
-    }),
+const handleTaskTypeUpdate = async (payload: { _id: string } & CreateTaskType) => {
+  await updateTaskTypeRepo(payload._id, {
+    taskName: payload.taskName,
+    number_of_machine: payload.number_of_machine,
+    color: payload.color,
   })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  else {
-    await fetchTaskTypes()
-    console.log('updated task type:', payload)
-  }
+  await fetchTaskTypes()
+  console.log('updated task type:', payload)
+}
+
+async function handleTaskTypeCreate(payload: CreateTaskType) {
+  await createTaskTypeRepo({
+    taskName: payload.taskName,
+    number_of_machine: payload.number_of_machine,
+    color: payload.color,
+  })
+  await fetchTaskTypes()
+  console.log('new task type:', payload)
 }
 
 const handleUserDelete = async (id: string) => {
@@ -278,25 +269,6 @@ async function handleMachineCreate(newMachine: { machineName: string; taskIds: s
     const machine = (await res.json()) as Machine
     await fetchMachines()
     console.log('new machine:', machine)
-  }
-}
-
-async function handleTaskTypeCreate(payload: { taskName: string; number_of_machine: number }) {
-  console.log(payload)
-  const base = import.meta.env.VITE_API_BASE_URL
-  const res = await fetch(`${base}/task-types`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      taskName: payload.taskName,
-      number_of_machine: payload.number_of_machine,
-    }),
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  else {
-    const taskType = (await res.json()) as TaskType
-    await fetchTaskTypes()
-    console.log('new task type:', taskType)
   }
 }
 </script>

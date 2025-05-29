@@ -1,6 +1,6 @@
 <template>
   <Sheet :open="props.open" @update:open="handleOpenChange">
-    <SheetContent side="right" class="w-[400px] sm:w-[540px] p-0 flex flex-col">
+    <SheetContent side="right" class="w-[500px] sm:w-[600px] p-0 flex flex-col">
       <SheetHeader class="p-6 pb-4">
         <SheetTitle>自動指派預覽</SheetTitle>
         <SheetDescription>以下是系統建議的自動指派結果，請檢閱後確認。</SheetDescription>
@@ -17,33 +17,51 @@
           <p>目前沒有可建議的指派任務。</p>
         </div>
         <ul v-else class="space-y-4">
-          <li v-for="item in previewAssignments" :key="item.taskId" class="p-1">
-            <div class="flex items-center justify-between space-x-3">
+          <li v-for="item in previewAssignments" :key="item.taskId" class="p-1 flex flex-col gap-2">
+            <div class="flex items-stretch justify-between space-x-3">
               <!-- Task Info -->
-              <div class="flex-1 min-w-0 bg-muted/50 p-3 rounded-md">
-                <p class="text-xs text-muted-foreground">任務</p>
-                <p class="font-semibold truncate" :title="item.taskName">{{ item.taskName }}</p>
+              <div class="flex-1 min-w-0 p-4 rounded-md flex flex-col gap-1">
+                <p class="px-1 text-sm text-muted-foreground">任務</p>
+                <p class="px-1 text-xl font-thin truncate" :title="item.taskName">
+                  {{ item.taskName }}
+                </p>
+                <ColorBadge
+                  class="w-fit"
+                  :label="getDraftTask(item.taskId)?.taskTypeId.taskName ?? '未知'"
+                  :primaryColor="getDraftTask(item.taskId)?.taskTypeId.color ?? '#EA4B44'"
+                />
               </div>
 
               <!-- Arrow Icon -->
-              <div class="flex-shrink-0 px-2">
+              <div class="flex-shrink-0 px-2 flex items-center justify-center">
                 <ArrowRight class="w-6 h-6 text-muted-foreground" />
               </div>
 
               <!-- Assignee Info -->
-              <div class="flex-1 min-w-0 bg-muted/50 p-3 rounded-md">
-                <p class="text-xs text-muted-foreground">預計指派給</p>
+              <div
+                class="flex-1 min-w-0 p-4 rounded-md flex flex-col gap-1 justify-start items-start"
+              >
+                <p class="px-1 text-sm text-muted-foreground">預計指派給</p>
                 <template v-if="item.previewAssignee">
-                  <p class="font-semibold truncate" :title="item.previewAssignee.userName">
+                  <p class="px-1 text-xl font-thin truncate" :title="item.previewAssignee.userName">
                     {{ item.previewAssignee.userName }}
                   </p>
+                  <div class="flex flex-wrap gap-1">
+                    <ColorBadge
+                      v-for="taskType in getWorker(item.previewAssignee._id)?.user_task_types"
+                      :key="taskType._id"
+                      :label="taskType.taskName"
+                      :primaryColor="taskType.color ?? '#EA4B44'"
+                    />
+                  </div>
                 </template>
                 <template v-else>
                   <p class="font-semibold text-orange-500">無法自動指派</p>
-                  <p class="text-xs text-muted-foreground">請手動處理</p>
+                  <p class="text-sm text-muted-foreground">請手動處理</p>
                 </template>
               </div>
             </div>
+            <Separator />
           </li>
         </ul>
       </div>
@@ -80,30 +98,37 @@ import {
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast/use-toast'
 import { ArrowRight } from 'lucide-vue-next' // Import the icon
+import { Separator } from '@/components/ui/separator'
 import { autoAssignTasksPreview, autoAssignTasks } from '@/repositories/taskRepo' // Import your functions
-// --- Types ---
-interface PreviewAssignmentItem {
-  taskId: string
-  taskName: string
-  previewAssignee?: {
-    _id: string
-    userName: string
-  }
-}
+import type { AutoAssignPreview } from '@/types/task'
+import type { UserWithTasks } from '@/types/user'
+import type { Task } from '@/types/task'
+import ColorBadge from '@/components/ColorBadge.vue'
 
 // --- Props & Emits ---
 const props = defineProps<{
   open: boolean
   assignerId: string // Added assignerId prop
+  workers: UserWithTasks[]
+  draftTasks: Task[]
 }>()
 
 const emit = defineEmits(['update:open', 'assignments-confirmed', 'assignments-failed'])
 
 // --- State ---
-const previewAssignments = ref<PreviewAssignmentItem[]>([])
+const previewAssignments = ref<AutoAssignPreview[]>([])
 const isLoadingPreview = ref(false)
 const errorPreview = ref<string | null>(null)
 const isAssigning = ref(false)
+
+function getDraftTask(taskId: string) {
+  return props.draftTasks.find((task) => task._id === taskId)
+}
+
+function getWorker(workerId: string) {
+  return props.workers.find((worker) => worker._id === workerId)
+}
+
 // --- API Functions ---
 async function fetchPreview() {
   if (!props.open) return
@@ -112,7 +137,7 @@ async function fetchPreview() {
   previewAssignments.value = []
   try {
     const data = await autoAssignTasksPreview() // Use your imported function
-    previewAssignments.value = data as PreviewAssignmentItem[] // Assuming it returns the correct type
+    previewAssignments.value = data as AutoAssignPreview[] // Assuming it returns the correct type
 
     if (previewAssignments.value.length === 0) {
       toast({

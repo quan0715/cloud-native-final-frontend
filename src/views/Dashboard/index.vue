@@ -99,6 +99,8 @@
   <AutoAssignSheet
     :open="isAutoAssignDrawerOpen"
     :assignerId="userId"
+    :workers="workers"
+    :draftTasks="draftTask"
     @update:open="isAutoAssignDrawerOpen = $event"
     @assignments-confirmed="handleAssignmentsConfirmed"
   />

@@ -7,7 +7,11 @@
 
         <p class="text-xl font-thin px-1">{{ task.taskName }}</p>
       </div>
-      <ColorBadge :label="task.taskTypeId.taskName" primaryColor="EA4B44" class="text-sm" />
+      <ColorBadge
+        :label="task.taskTypeId.taskName"
+        :primaryColor="task.taskTypeId.color ?? '#EA4B44'"
+        class="text-sm"
+      />
     </div>
     <Button
       variant="ghost"

@@ -62,7 +62,7 @@ import {
   updateTaskType as updateTaskTypeRepo,
   deleteTaskType as deleteTaskTypeRepo,
 } from '@/repositories/taskRepo'
-
+import type { CreateTaskType } from '@/types/taskType'
 const { username } = useUserData()
 
 const currentTab = ref('使用者管理')
@@ -169,12 +169,7 @@ const handleTaskTypeDelete = async (id: string) => {
   console.log('deleted task type:', id)
 }
 
-const handleTaskTypeUpdate = async (payload: {
-  _id: string
-  taskName: string
-  number_of_machine: number
-  color: string
-}) => {
+const handleTaskTypeUpdate = async (payload: { _id: string } & CreateTaskType) => {
   await updateTaskTypeRepo(payload._id, {
     taskName: payload.taskName,
     number_of_machine: payload.number_of_machine,
@@ -182,6 +177,16 @@ const handleTaskTypeUpdate = async (payload: {
   })
   await fetchTaskTypes()
   console.log('updated task type:', payload)
+}
+
+async function handleTaskTypeCreate(payload: CreateTaskType) {
+  await createTaskTypeRepo({
+    taskName: payload.taskName,
+    number_of_machine: payload.number_of_machine,
+    color: payload.color,
+  })
+  await fetchTaskTypes()
+  console.log('new task type:', payload)
 }
 
 const handleUserDelete = async (id: string) => {
@@ -265,19 +270,5 @@ async function handleMachineCreate(newMachine: { machineName: string; taskIds: s
     await fetchMachines()
     console.log('new machine:', machine)
   }
-}
-
-async function handleTaskTypeCreate(payload: {
-  taskName: string
-  number_of_machine: number
-  color: string
-}) {
-  await createTaskTypeRepo({
-    taskName: payload.taskName,
-    number_of_machine: payload.number_of_machine,
-    color: payload.color,
-  })
-  await fetchTaskTypes()
-  console.log('new task type:', payload)
 }
 </script>

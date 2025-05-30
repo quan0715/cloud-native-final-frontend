@@ -26,6 +26,7 @@ test.describe('Leader UI Rendering', () => {
       await page.getByRole('option', { name: '電性測試' }).click();
       await page.getByPlaceholder('輸入任務名稱').fill('test')
       await page.getByRole('button', { name: '確定' }).click()
+      await page.waitForTimeout(1000); 
       await expect(page.getByText('test')).toBeVisible()
   })
 
@@ -41,10 +42,11 @@ test.describe('Leader UI Rendering', () => {
     await login(page, 'leader001', '123456')
     await expect(page).toHaveURL('/dashboard')
   
-    const taskCard = page.getByRole('article').filter({ hasText: 'test' })
-    await taskCard.hover()
-    await taskCard.getByRole('button', { name: 'edit', exact: false }).click()
-    
+    const taskCard = page.locator('div.border.bg-card').filter({ hasText: 'test' });
+    await expect(taskCard).toBeVisible();
+    await taskCard.hover();
+    await taskCard.getByRole('button', { name: /edit/i }).click();
+
     await page.getByRole('button', { name: '刪除' }).click()
     await page.getByRole('button', { name: '確定刪除' }).click()
 

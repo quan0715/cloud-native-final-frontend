@@ -49,6 +49,6 @@ test.describe('Leader UI Rendering', () => {
 
     await page.getByRole('button', { name: '刪除' }).click()
     await page.getByRole('button', { name: '確定刪除' }).click()
-    await expect(page.getByText('test', { exact: true })).not.toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('test', { exact: true })).toHaveCount(0);
     })
 })

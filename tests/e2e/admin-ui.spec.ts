@@ -28,7 +28,7 @@ test.describe('Admin UI Rendering', () => {
     await expect(page.getByText('test')).toBeVisible()
   })
 
-  test('delete the machine named "test"', async ({ page }) => {
+  test('deletes the machine named "test"', async ({ page }) => {
   await login(page, 'admin001', '123456')
   await expect(page).toHaveURL('/admin')
 
@@ -59,7 +59,7 @@ test.describe('Admin UI Rendering', () => {
     await expect(page.getByText('test')).toBeVisible()
   })
 
-  test('delete the task type named "test"', async ({ page }) => {
+  test('deletes the task type named "test"', async ({ page }) => {
   await login(page, 'admin001', '123456')
   await expect(page).toHaveURL('/admin')
   

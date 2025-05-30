@@ -22,7 +22,7 @@ test.describe('Leader UI Rendering', () => {
       await expect(page).toHaveURL('/dashboard')
 
       await page.getByRole('button', { name: '新增任務' }).click()
-      await page.getByRole('combobox', { name: '請選擇任務項目' }).click();
+      await page.getByRole('combobox').click();
       await page.getByRole('option', { name: '電性測試' }).click();
       await page.getByPlaceholder('輸入任務名稱').fill('test')
       await page.getByRole('button', { name: '確定' }).click()
@@ -37,7 +37,7 @@ test.describe('Leader UI Rendering', () => {
       await expect(page.getByText('test')).toBeVisible();
   })
 
-  test('delete the machine named "test"', async ({ page }) => {
+  test('deletes the task named "test"', async ({ page }) => {
     await login(page, 'leader001', '123456')
     await expect(page).toHaveURL('/dashboard')
   

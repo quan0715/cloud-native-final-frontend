@@ -1,10 +1,10 @@
 <template>
   <DashboardCard title="進行中任務">
-    <div v-if="inprogressTask !== null">
-      <div :key="inprogressTask._id" class="flex flex-col justify-start items-start gap-2 p-2">
+    <div v-if="inprogressTask">
+      <div class="flex flex-col justify-start items-start gap-2 p-2">
         <ColorBadge
-          :label="inprogressTask.taskType?.taskName ?? '未知'"
-          :primaryColor="inprogressTask.taskType?.color ?? 'purple'"
+          :label="inprogressTask.taskTypeId.taskName"
+          :primaryColor="inprogressTask.taskTypeId.color ?? 'purple'"
           class="text-sm"
         />
         <p class="text-xl text-sans font-semibold text-gray-600">
@@ -12,16 +12,16 @@
         </p>
       </div>
       <Separator class="w-full my-2" />
-      <div :key="inprogressTask._id" class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <div
-          v-for="(machine, idx) in inprogressTask.machine"
+          v-for="(machine, idx) in inprogressTask.taskData.machine"
           :key="idx"
           class="col-span-1 flex flex-row justify-start items-start gap-2"
         >
           <DashboardData title="佔用機器" :content="machine.machineName" />
           <Separator
             orientation="vertical"
-            v-if="inprogressTask.machine && (idx === 0 || idx % 3 != 0)"
+            v-if="inprogressTask.taskData.machine && (idx === 0 || idx % 3 != 0)"
           />
         </div>
       </div>
@@ -41,10 +41,9 @@
       v-else
       class="w-full h-full flex justify-center items-center"
       variant="secondary"
-      :disabled="inprogressTask !== null"
       @click="startNextTask"
     >
-      {{ inprogressTask !== null ? '有進行中的任務' : '點擊開始測試任務' }}
+      點擊開始測試任務
     </Button>
   </DashboardCard>
 </template>
@@ -54,8 +53,8 @@ import DashboardCard from '@/components/DashboardCard.vue'
 import DashboardData from '@/components/DashboardData.vue'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import type { TaskSnapshot } from '@/types/user'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import type { Task } from '@/types/task'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { startNext, finishTask, failToFinishTask } from '@/repositories/taskRepo'
 import { useUserData } from '@/composables/useUserData'
 import { toast } from '@/components/ui/toast'
@@ -64,14 +63,24 @@ const { userId } = useUserData()
 
 // TODO: add proper type for tasks, add api on it
 
-const { inprogressTask } = defineProps<{ inprogressTask: TaskSnapshot | null }>()
+const { inprogressTask } = defineProps<{ inprogressTask: Task | null }>()
 const emit = defineEmits(['taskStarted', 'taskCompleted', 'taskFailed'])
 
-console.log('InprogressTaskCard props:', inprogressTask)
-
-// const startTime = ref(inprogressTask.value?.startTime ?? new Date())
 const startTime = ref(new Date())
 const now = ref(new Date())
+
+// 監聽 inprogressTask 的變化，當數據載入後設置正確的 startTime
+watch(
+  () => inprogressTask,
+  (newTask) => {
+    if (newTask?.taskData.startTime) {
+      startTime.value = new Date(newTask.taskData.startTime)
+      console.log('Setting startTime from task:', newTask.taskData.startTime)
+      console.log('Parsed startTime:', startTime.value)
+    }
+  },
+  { immediate: true }, // 立即執行一次
+)
 
 let timer: number | undefined
 

@@ -47,8 +47,6 @@ const { task } = defineProps<{
   task: TaskSnapshot
 }>()
 
-console.log('task', task)
-
 const taskState = computed(() => {
   switch (task.state) {
     case 'assigned':
@@ -64,7 +62,7 @@ const taskState = computed(() => {
     case 'success':
     default:
       return {
-        label: '未知',
+        label: `${task.state}-未知`,
         status: 'idle',
       }
   }

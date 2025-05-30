@@ -20,7 +20,7 @@
           <li v-for="item in previewAssignments" :key="item.taskId" class="p-1 flex flex-col gap-2">
             <div class="flex items-stretch justify-between space-x-3">
               <!-- Task Info -->
-              <div class="flex-1 min-w-0 p-4 rounded-md flex flex-col gap-1">
+              <div class="flex-1 min-w-0 rounded-md flex flex-col gap-1">
                 <p class="px-1 text-sm text-muted-foreground">任務</p>
                 <p class="px-1 text-xl font-thin truncate" :title="item.taskName">
                   {{ item.taskName }}
@@ -38,9 +38,7 @@
               </div>
 
               <!-- Assignee Info -->
-              <div
-                class="flex-1 min-w-0 p-4 rounded-md flex flex-col gap-1 justify-start items-start"
-              >
+              <div class="flex-1 min-w-0 rounded-md flex flex-col gap-1 justify-start items-start">
                 <p class="px-1 text-sm text-muted-foreground">預計指派給</p>
                 <template v-if="item.previewAssignee">
                   <p class="px-1 text-xl font-thin truncate" :title="item.previewAssignee.userName">

@@ -19,7 +19,7 @@
           class="text-sm p-0"
         />
       </div>
-      <p v-if="worker.inProgressTasks.length > 0" class="text-sm text-gray-500">
+      <p v-if="worker.inProgressTasks.length > 0" class="text-sm text-gray-500 font-mono">
         正在進行 {{ worker.inProgressTasks[0].taskName }}
       </p>
     </div>

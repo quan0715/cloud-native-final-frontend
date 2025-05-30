@@ -27,7 +27,7 @@ test.describe('Leader UI Rendering', () => {
       await page.getByPlaceholder('輸入任務名稱').fill('test')
       await page.getByRole('button', { name: '確定' }).click()
       await page.waitForTimeout(1000); 
-      await expect(page.getByText('test')).toBeVisible()
+      await expect(page.getByText('test', { exact: true })).toBeVisible({ timeout: 5000 });
   })
 
   test('auto-assign page should have "test" task', async ({page}) => {
@@ -35,7 +35,7 @@ test.describe('Leader UI Rendering', () => {
       await expect(page).toHaveURL('/dashboard')
 
       await page.getByRole('button', { name: '自動指派' }).click()
-      await expect(page.getByText('test')).toBeVisible();
+      await expect(page.getByText('test', { exact: true })).toBeVisible({ timeout: 5000 });
   })
 
   test('deletes the task named "test"', async ({ page }) => {
@@ -43,8 +43,8 @@ test.describe('Leader UI Rendering', () => {
     await expect(page).toHaveURL('/dashboard')
     
     const taskCard = page.getByText('test').locator('xpath=ancestor::div[contains(@class, "border")]');
+    await taskCard.hover();
     const editBtn = taskCard.locator('button:has(svg.lucide-pen)');
-
     await editBtn.click();
 
     await page.getByRole('button', { name: '刪除' }).click()

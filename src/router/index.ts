@@ -72,8 +72,6 @@ export function getUserDefaultRoute(userRole: string) {
 }
 
 router.beforeEach((to, from, next) => {
-  console.log('to', to)
-  console.log('from', from)
   const token = localStorage.getItem('token')
   const isLoginRoute = to.path === '/login'
 

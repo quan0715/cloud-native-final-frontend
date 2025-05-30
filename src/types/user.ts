@@ -1,5 +1,5 @@
 import type { ISODate, ObjectId } from './base'
-import type { TaskType } from './task'
+import type { Task, TaskType } from './task'
 
 export enum UserRole {
   Admin = 'admin',
@@ -39,7 +39,7 @@ export interface UserWithTasks {
   userName: string
   user_task_types: TaskType[]
   userRole: UserRole
-  assignedTasks: TaskSnapshot[]
-  inProgressTasks: TaskSnapshot[]
-  completedTasks: TaskSnapshot[]
+  assignedTasks: Task[]
+  inProgressTasks: Task[]
+  completedTasks: Task[]
 }

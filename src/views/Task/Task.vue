@@ -5,10 +5,16 @@
         <span class="text-blue-600">LAB 11</span> / {{ username }} 歡迎回來
       </h1>
       <div class="w-full grid grid-cols-3 gap-4">
-        <UserWeaklyReview class="col-span-1" :total="totalTasks" :completed="completedTasks" />
+        <UserWeaklyReview
+          class="col-span-1"
+          :total="workerWeaklyReview?.total ?? 0"
+          :completed="workerWeaklyReview?.completed ?? 0"
+          :toDayNewTaskCount="workerWeaklyReview?.toDayNewTaskCount ?? 0"
+          :toDayCompletedTaskCount="workerWeaklyReview?.toDayCompletedTaskCount ?? 0"
+        />
         <InprogressTaskCard
           class="col-span-2"
-          :inprogress-task="inprogressTask"
+          :inprogress-task="inProgressTask ?? null"
           @taskStarted="fetchWorker"
           @taskCompleted="fetchWorker"
           @taskFailed="fetchWorker"
@@ -19,7 +25,7 @@
       <h1 class="w-fit text-2xl font-thin">已指派（待完成）</h1>
       <div class="w-full col-span-3">
         <div class="w-full grid grid-cols-3 gap-4">
-          <TaskSnapShotCard v-for="task in userTasks?.assignedTasks" :key="task._id" :task="task" />
+          <TaskCard v-for="task in userTasks?.assignedTasks" :key="task._id" :task="task" />
         </div>
       </div>
     </div>
@@ -32,25 +38,36 @@ import type { UserWithTasks } from '@/types/user'
 import InprogressTaskCard from '@/views/Task/InprogressTaskCard.vue'
 import UserWeaklyReview from '@/views/Task/UserWeaklyReview.vue'
 import type { Ref } from 'vue'
-import { computed, inject, onMounted, ref } from 'vue'
-import { fetchWorkers as fetchWorkersFromRepo } from '@/repositories/WorkerRepo'
-import TaskSnapShotCard from '@/components/Task/TaskSnapShotCard.vue'
+import { inject, onMounted, ref } from 'vue'
+import { fetchWorker as fetchWorkerFromRepo } from '@/repositories/WorkerRepo'
 import { Separator } from '@/components/ui/separator'
+import type { Task } from '@/types/task'
+import TaskCard from '@/components/Task/TaskCard.vue'
+import { getWorkerWeaklyReview } from '@/repositories/taskRepo'
 
-const { username } = useUserData()
+const { username, userId } = useUserData()
 
 const loading = inject<Ref<boolean>>('globalLoading')!
 const error = ref<string | null>(null)
 const userTasks = ref<UserWithTasks | undefined>()
+const inProgressTask = ref<Task | null>()
+const workerWeaklyReview = ref()
 
 /* ---------------- 取後端資料 ---------------- */
 async function fetchWorker() {
   loading.value = true
   error.value = null
+  inProgressTask.value = null
   try {
-    const workers = await fetchWorkersFromRepo()
-    userTasks.value = workers.find((w) => w.userName === username)
-    console.log('userTasks', userTasks.value)
+    const res = await fetchWorkerFromRepo(userId)
+    console.log(res)
+    const inProgress = res.inProgressTasks[0]
+    if (inProgress) {
+      inProgressTask.value = inProgress
+    }
+    userTasks.value = res
+    workerWeaklyReview.value = await getWorkerWeaklyReview(userId)
+    console.log(workerWeaklyReview.value)
   } catch (e) {
     error.value = e as string
   } finally {
@@ -58,21 +75,7 @@ async function fetchWorker() {
   }
 }
 
-onMounted(fetchWorker)
-
-/* ---------------- 統計數量 (computed) ---------------- */
-const inprogressTask = computed(() => {
-  if (!userTasks.value?.inProgressTasks) return null
-  return userTasks.value.inProgressTasks[0]
-})
-const totalTasks = computed(() => {
-  const u = userTasks.value
-  if (!u) return -1
-  return u.assignedTasks.length + u.inProgressTasks.length + u.completedTasks.length
-})
-
-const completedTasks = computed(() => {
-  const u = userTasks.value
-  return u ? u.completedTasks.length : -1
+onMounted(async () => {
+  await fetchWorker()
 })
 </script>

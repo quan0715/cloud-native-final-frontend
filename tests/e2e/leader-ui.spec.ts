@@ -41,11 +41,11 @@ test.describe('Leader UI Rendering', () => {
   test('deletes the task named "test"', async ({ page }) => {
     await login(page, 'leader001', '123456')
     await expect(page).toHaveURL('/dashboard')
-  
-    const taskCard = page.locator('div.border.bg-card').filter({ hasText: 'test' });
-    await expect(taskCard).toBeVisible();
-    await taskCard.hover();
-    await taskCard.getByRole('button', { name: /edit/i }).click();
+    
+    const taskCard = page.getByText('test').locator('xpath=ancestor::div[contains(@class, "border")]');
+    const editBtn = taskCard.locator('button:has(svg.lucide-pen)');
+
+    await editBtn.click();
 
     await page.getByRole('button', { name: '刪除' }).click()
     await page.getByRole('button', { name: '確定刪除' }).click()

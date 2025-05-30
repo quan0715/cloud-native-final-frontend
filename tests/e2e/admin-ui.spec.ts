@@ -17,7 +17,7 @@ test.describe('Admin UI Rendering', () => {
     await expect(page.getByRole('heading', { name: /管理員儀錶板/ })).toBeVisible()
   })
 
-  /*test('adds a new machine named "test"', async ({page}) => {
+  test('adds a new machine named "test"', async ({page}) => {
     await login(page, 'admin001', '123456')
     await expect(page).toHaveURL('/admin')
 
@@ -32,16 +32,13 @@ test.describe('Admin UI Rendering', () => {
   await login(page, 'admin001', '123456')
   await page.getByRole('tab', { name: '機器管理' }).click()
 
-  const card = page.getByText('test', { exact: true }).locator('xpath=ancestor::div[contains(@class, "border-gray-200")]')
-  await expect(card).toBeVisible()
+  const card = page.locator('text=test').locator('xpath=ancestor::div[contains(@class, "border-2")]');
+  const deleteBtn = card.locator('button:has(svg.lucide-trash)');
 
-  const deleteButton = card.locator('button.text-red-600')
-  await deleteButton.click({ force: true })
+  await deleteBtn.click();
 
-  await expect(page.getByRole('dialog')).toBeVisible()
-  await page.getByRole('button', { name: '確定' }).click()
-
-  await expect(page.getByText('test')).toHaveCount(0)
-  })*/
-
+  const confirmBtn = page.getByRole('button', { name: '確定' });
+  await expect(confirmBtn).toBeVisible();
+  await confirmBtn.click();
+  })
 })

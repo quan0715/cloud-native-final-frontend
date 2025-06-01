@@ -19,7 +19,7 @@
       </DashboardData>
     </div>
     <Separator />
-    <DashboardData title="平均測試任務進行時間" content="0 小時 53 分鐘" />
+    <DashboardData title="平均測試任務進行時間" :content="averageTaskTimeText" />
   </DashboardCard>
 </template>
 
@@ -27,8 +27,8 @@
 import DashboardCard from '@/components/DashboardCard.vue'
 import DashboardData from '@/components/DashboardData.vue'
 import { Separator } from '@/components/ui/separator'
-
-const { total, completed } = defineProps({
+import { defineProps, computed } from 'vue'
+const props = defineProps({
   total: {
     type: Number,
     default: 0,
@@ -45,5 +45,14 @@ const { total, completed } = defineProps({
     type: Number,
     default: 0,
   },
+  averageTaskTime: {
+    type: Number,
+    default: 0,
+  },
+})
+const averageTaskTimeText = computed(() => {
+  const hours = Math.floor(props.averageTaskTime / 60)
+  const minutes = Math.floor(props.averageTaskTime % 60)
+  return `${hours} 小時 ${minutes} 分鐘`
 })
 </script>

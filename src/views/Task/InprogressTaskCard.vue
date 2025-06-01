@@ -40,9 +40,10 @@
     <Button
       v-else
       class="w-full h-full flex justify-center items-center"
-      variant="secondary"
+      variant="ghost"
       @click="startNextTask"
     >
+      <PlayIcon class="w-4 h-4" />
       點擊開始測試任務
     </Button>
   </DashboardCard>
@@ -59,6 +60,7 @@ import { startNext, finishTask, failToFinishTask } from '@/repositories/taskRepo
 import { useUserData } from '@/composables/useUserData'
 import { toast } from '@/components/ui/toast'
 import ColorBadge from '@/components/ColorBadge.vue'
+import { PlayIcon } from 'lucide-vue-next'
 const { userId } = useUserData()
 
 // TODO: add proper type for tasks, add api on it

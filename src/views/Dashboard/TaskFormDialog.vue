@@ -16,7 +16,8 @@
             </SelectTrigger>
             <SelectContent>
               <SelectItem v-for="n in taskType" :key="n._id" :value="n._id">
-                {{ n.taskName }}
+                <!-- {{ n.taskName }} -->
+                <ColorBadge :label="n.taskName" :primaryColor="n.color ?? '#3B82F6'" />
               </SelectItem>
             </SelectContent>
           </Select>
@@ -95,6 +96,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import ColorBadge from '@/components/ColorBadge.vue'
 
 interface Props {
   modelValue: boolean

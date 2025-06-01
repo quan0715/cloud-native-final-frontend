@@ -11,6 +11,7 @@
           :completed="workerWeaklyReview?.completed ?? 0"
           :toDayNewTaskCount="workerWeaklyReview?.toDayNewTaskCount ?? 0"
           :toDayCompletedTaskCount="workerWeaklyReview?.toDayCompletedTaskCount ?? 0"
+          :averageTaskTime="workerWeaklyReview?.averageTaskTime ?? 0"
         />
         <InprogressTaskCard
           class="col-span-2"

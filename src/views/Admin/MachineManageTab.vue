@@ -1,158 +1,59 @@
 <template>
   <DashboardCard title="實驗室機器管理" class="w-full">
     <template #action>
-      <Dialog v-model:open="createOpen">
-        <!-- 觸發按鈕 -->
-        <DialogTrigger as-child>
-          <Button variant="outline">
-            <div class="flex items-center gap-2">
-              <Plus class="w-4 h-4" />
-              新增機器
-            </div>
-          </Button>
-        </DialogTrigger>
-
-        <!-- 表單內容 -->
-        <DialogContent class="max-w-md">
-          <DialogHeader>
-            <DialogTitle>新增機器</DialogTitle>
-          </DialogHeader>
-
-          <div class="space-y-4">
-            <!-- 任務複選 -->
-            <div>
-              <Label class="mb-1 block">機器負責任務項目（可複選）</Label>
-              <div
-                v-for="t in taskTypes"
-                :key="t._id"
-                class="flex items-center gap-2"
-              >
-                <Checkbox
-                  :model-value="createTaskIds.includes(t._id)"
-                  @update:model-value="toggleCreateTask(t._id)"
-                />
-                <span>{{ t.taskName }}</span>
-              </div>
-            </div>
-
-            <!-- 機器名稱 -->
-            <div>
-              <Label class="mb-1 block">輸入機器名稱</Label>
-              <Input v-model="createName" placeholder="機器名稱" />
-            </div>
+      <MachineFormDialog
+        :taskTypes="taskTypes"
+        :machine="undefined"
+        @create="handleCreateEvent"
+        @update="handleUpdateEvent"
+        @delete="handleDeleteEvent"
+      >
+        <Button variant="outline">
+          <div class="flex items-center gap-2">
+            <Plus class="w-4 h-4" />
+            新增機器
           </div>
-
-          <DialogFooter>
-            <DialogClose as-child>
-              <Button variant="secondary" @click="resetCreate">取消</Button>
-            </DialogClose>
-            <DialogClose as-child>
-              <Button @click="submitCreate">確定</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </Button>
+      </MachineFormDialog>
     </template>
     <div class="flex flex-col gap-2">
-      <div
-        v-for="m in machines"
-        :key="m._id"
-        class="flex flex-col gap-2"
-      >
+      <div v-for="m in machines" :key="m._id" class="flex flex-col gap-2">
         <div class="flex items-stretch gap-4 border-2 border-gray-200 p-4 rounded-xl">
           <!-- 機器名稱 -->
-          <div class="flex flex-col gap-1 min-w-48">
-            <p class="text-sm text-gray-500">ID: {{ m._id }}</p>
-            <p class="text-xl font-semibold">{{ m.machineName }}</p>
+          <div class="flex-1 flex flex-col justify-start items-start gap-2">
+            <!-- 任務標題 -->
+            <div id="task-header" class="flex flex-col justify-start items-start gap-1.5">
+              <StatusBadge :label="m.status" :status="m.status" />
+              <p class="text-xl font-thin px-1">{{ m.machineName }}</p>
+            </div>
+            <Separator orientation="horizontal" class="w-full" />
+            <div class="flex flex-row justify-start items-center gap-2">
+              <ColorBadge
+                v-for="type in m.machine_task_types"
+                :key="type._id"
+                :label="type.taskName"
+                :primaryColor="type.color ?? '#EA4B44'"
+                class="text-sm p-0"
+              />
+            </div>
           </div>
-
-          <Separator orientation="vertical" class="h-auto" />
-
-          <!-- 任務類型 -->
-          <DashboardData
-            title="支援任務"
-            :content="m.machine_task_types.map((t) => t.taskName).join(', ')"
-          />
 
           <Separator orientation="vertical" class="h-auto" />
 
           <!-- 編輯 / 刪除 -->
           <div class="flex items-center gap-2">
+            <MachineFormDialog
+              :taskTypes="taskTypes"
+              :machine="m"
+              @update="handleUpdateEvent"
+              @delete="handleDeleteEvent"
+              @create="handleCreateEvent"
+            >
+              <Button variant="ghost" size="icon">
+                <Edit class="w-4 h-4" />
+              </Button>
+            </MachineFormDialog>
             <!-- Edit Dialog -->
-            <Dialog>
-              <DialogTrigger as-child>
-                <Button variant="ghost" size="icon" @click="openEdit(m)">
-                  <Edit class="w-4 h-4" />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent class="max-w-sm">
-                <DialogHeader>
-                  <DialogTitle>編輯機器</DialogTitle>
-                </DialogHeader>
-
-                <div class="space-y-4">
-                  <!-- 名稱 -->
-                  <div>
-                    <Label class="mb-1 block">機器名稱</Label>
-                    <Input v-model="editName" />
-                  </div>
-
-                  <!-- 多選任務 (checkbox) -->
-                  <div>
-                    <Label class="mb-1 block">支援任務</Label>
-                    <div
-                      v-for="t in taskTypes"
-                      :key="t._id"
-                      class="flex items-center gap-2"
-                    >
-                      <Checkbox
-                          :model-value="editTaskIds.includes(t._id)"
-                          @update:model-value="toggleTask(t._id)"
-                      />
-                      <span>{{ t.taskName }}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <DialogFooter>
-                  <DialogClose as-child>
-                    <Button variant="secondary" @click="closeEdit">取消</Button>
-                  </DialogClose>
-                  <DialogClose as-child>
-                    <Button @click="saveEdit(m._id)">儲存</Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-
-            <!-- Delete Alert -->
-            <AlertDialog>
-              <AlertDialogTrigger as-child>
-                <Button variant="ghost" size="icon" class="text-red-600">
-                  <Trash class="w-4 h-4" />
-                </Button>
-              </AlertDialogTrigger>
-
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>確定刪除？</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    刪除後將無法恢復。
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                  <AlertDialogCancel>取消</AlertDialogCancel>
-                  <AlertDialogAction
-                    class="bg-red-600 text-white"
-                    @click="emit('delete', m._id)"
-                  >
-                    確定
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
           </div>
         </div>
       </div>
@@ -162,94 +63,88 @@
 
 <script setup lang="ts">
 import DashboardCard from '@/components/DashboardCard.vue'
-import DashboardData from '@/components/DashboardData.vue'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog/'
+import MachineFormDialog from '@/components/Machine/MachineFormDialog.vue'
 import Button from '@/components/ui/button/Button.vue'
-import { Checkbox } from '@/components/ui/checkbox/'
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import type { Machine } from '@/types/machine'
-import type { TaskType } from '@/types/task'
-import { Edit, Plus, Trash } from 'lucide-vue-next'
-import { defineEmits, defineProps, ref } from 'vue'
-
-
+import { Edit, Plus } from 'lucide-vue-next'
+import { ref, onMounted, inject } from 'vue'
+import StatusBadge from '@/components/StatusBadge.vue'
+import ColorBadge from '@/components/ColorBadge.vue'
+import { toast } from '@/components/ui/toast'
+import { fetchMachines } from '@/repositories/MachineRepo'
+import { useTaskType } from '@/composables/useTaskType'
+import type { Ref } from 'vue'
 /* -------- props & emits -------- */
-const props = defineProps<{
-  machines: Machine[]
-  taskTypes: TaskType[]            // 父層提前傳入全部 TaskType
-}>()
+const machines = ref<Machine[]>([])
+const loading = inject<Ref<boolean>>('globalLoading')!
 
-const emit = defineEmits<{
-  /** 儲存修改 */
-  (e: 'update', payload: { _id: string; machineName: string; taskIds: string[] }): void
-  /** 刪除 */
-  (e: 'delete', id: string): void
-  /** 新增機器 */
-  (e: 'create', payload: { machineName: string; taskIds: string[] }): void
-}>()
+const { taskTypes, fetchTaskTypes } = useTaskType()
 
-/* -------- 編輯表單狀態 -------- */
-const editName     = ref('')
-const editTaskIds  = ref<string[]>([])
+// const props = defineProps<{
+//   machines: Machine[]
+//   taskTypes: TaskType[] // 父層提前傳入全部 TaskType
+// }>()
 
-function closeEdit() {
-  editName.value = ''
-  editTaskIds.value = []
-
-}
-
-function saveEdit(id: string) {
-  console.log('saveEdit', id, editName.value, editTaskIds.value)
-  emit('update', {
-    _id: id,
-    machineName: editName.value,
-    taskIds: editTaskIds.value,
-  })
-  closeEdit()
-}
-function toggleTask(id: string) {
-  console.log('toggleTask', id)
-  if (editTaskIds.value.includes(id)) {
-    editTaskIds.value = editTaskIds.value.filter((t) => t !== id)
+async function handleDeleteEvent(state: 'success' | 'error', message: string) {
+  if (state === 'success') {
+    toast({
+      title: `機器刪除成功`,
+      description: message,
+      variant: 'default',
+    })
+    await _syncWithRepo()
   } else {
-    editTaskIds.value.push(id)
+    toast({
+      title: `機器刪除失敗`,
+      description: message,
+      variant: 'destructive',
+    })
   }
 }
-function openEdit(machine: Machine) {
-  editName.value    = machine.machineName
-  // 先取出 _id 陣列放進 editTaskIds
-  editTaskIds.value = machine.machine_task_types.map((t) => t._id)
-}
-
-const createOpen   = ref(false)
-const createName   = ref('')
-const createTaskIds = ref<string[]>([])
-
-function resetCreate() {
-  createName.value = ''
-  createTaskIds.value = []
-}
-
-/* 勾選 / 取消 checkbox */
-function toggleCreateTask(id: string) {
-  console.log('toggleTask', id)
-  if (createTaskIds.value.includes(id)) {
-    createTaskIds.value = createTaskIds.value.filter((t) => t !== id)
-  } else {
-    createTaskIds.value.push(id)
-  }
-}
-
 /* 提交新增 */
-function submitCreate() {
-  emit('create', {
-    machineName: createName.value,
-    taskIds: createTaskIds.value,
-  })
-  resetCreate()
+async function handleCreateEvent(state: 'success' | 'error', message: string) {
+  if (state === 'success') {
+    toast({
+      title: `機器新增成功`,
+      description: message,
+      variant: 'default',
+    })
+    await _syncWithRepo()
+  } else {
+    toast({
+      title: `機器新增失敗`,
+      description: message,
+      variant: 'destructive',
+    })
+  }
 }
-</script>
 
+async function handleUpdateEvent(state: 'success' | 'error', message: string) {
+  if (state === 'success') {
+    toast({
+      title: `機器更新成功`,
+      description: message,
+      variant: 'default',
+    })
+    await _syncWithRepo()
+  } else {
+    toast({
+      title: `機器更新失敗`,
+      description: message,
+      variant: 'destructive',
+    })
+  }
+}
+
+async function _syncWithRepo() {
+  loading.value = true
+  machines.value = await fetchMachines()
+  await fetchTaskTypes()
+  loading.value = false
+}
+
+onMounted(async () => {
+  await _syncWithRepo()
+})
+</script>

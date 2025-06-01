@@ -20,13 +20,7 @@
             />
           </TabsContent>
           <TabsContent value="機器管理">
-            <MachineManageTab
-              :machines="machines"
-              :taskTypes="taskTypes"
-              @delete="handleMachineDelete"
-              @update="handleMachineUpdate"
-              @create="handleMachineCreate"
-            />
+            <MachineManageTab />
           </TabsContent>
           <TabsContent value="任務類型管理">
             <TaskTypeManageTab
@@ -47,7 +41,7 @@
 import DashboardCard from '@/components/DashboardCard.vue'
 import Separator from '@/components/ui/separator/Separator.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import type { Machine } from '@/types/machine'
+// import type { Machine } from '@/types/machine'
 import type { TaskType } from '@/types/task'
 import type { User } from '@/types/user'
 import MachineManageTab from '@/views/Admin/MachineManageTab.vue'
@@ -70,7 +64,7 @@ const tabTriggerClass = 'w-full px-4 py-2'
 
 // fetch /users
 const users = ref<User[]>([])
-const machines = ref<Machine[]>([])
+// const machines = ref<Machine[]>([])
 const taskTypes = ref<TaskType[]>([])
 const loading = inject<Ref<boolean>>('globalLoading')!
 const error = ref<string | null>(null)
@@ -93,26 +87,6 @@ async function fetchUsers() {
     loading.value = false
   }
 }
-
-async function fetchMachines() {
-  loading.value = true
-  error.value = null
-  try {
-    const base = import.meta.env.VITE_API_BASE_URL // .env 裡設定
-    const res = await fetch(`${base}/machines`, {
-      // 若後端要帶 cookie
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    machines.value = (await res.json()) as Machine[]
-  } catch (e: any) {
-    error.value = e.message ?? 'Unknown error'
-  } finally {
-    loading.value = false
-  }
-  console.log('fetch machines:', machines.value)
-}
-
 async function fetchTaskTypes() {
   loading.value = true
   error.value = null
@@ -126,42 +100,8 @@ async function fetchTaskTypes() {
 }
 
 fetchUsers()
-fetchMachines()
+// fetchMachines()
 fetchTaskTypes()
-
-const handleMachineDelete = async (id: string) => {
-  const base = import.meta.env.VITE_API_BASE_URL
-  const res = await fetch(`${base}/machines/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  else {
-    await fetchMachines()
-    console.log('deleted machine:', id)
-  }
-}
-const handleMachineUpdate = async (payload: {
-  _id: string
-  machineName: string
-  taskIds: string[]
-}) => {
-  console.log(payload)
-  const base = import.meta.env.VITE_API_BASE_URL
-  const res = await fetch(`${base}/machines/${payload._id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      machineName: payload.machineName,
-      machine_task_types: payload.taskIds,
-    }),
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  else {
-    await fetchMachines()
-    console.log('updated machine:', payload)
-  }
-}
 
 const handleTaskTypeDelete = async (id: string) => {
   await deleteTaskTypeRepo(id)
@@ -252,23 +192,5 @@ const handleUserUpdate = async (payload: {
 
   /* ---------- 6. 重新抓最新資料 ---------- */
   await fetchUsers()
-}
-
-async function handleMachineCreate(newMachine: { machineName: string; taskIds: string[] }) {
-  const base = import.meta.env.VITE_API_BASE_URL
-  const res = await fetch(`${base}/machines`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      machineName: newMachine.machineName,
-      machine_task_types: newMachine.taskIds,
-    }),
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  else {
-    const machine = (await res.json()) as Machine
-    await fetchMachines()
-    console.log('new machine:', machine)
-  }
 }
 </script>

@@ -213,32 +213,42 @@ export async function getWorkerWeaklyReview(userId: string) {
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
   const res = (await response.json()) as {
     count: number
-    tasks: {
-      taskId: string
-      taskName: string
-      state: string
-      assignTime: string
-      startTime?: string
-      endTime?: string
-    }[]
+    tasks: Task[]
   }
   console.log(res)
-  const completed = res.tasks.filter((task) => task.state === 'success')
+  const completed = res.tasks.filter((task) => task.taskData.state === 'success')
   const toDayNewTaskCount = res.tasks.filter((task) => {
-    const taskDate = new Date(task.assignTime)
+    const taskDate = new Date(task.taskData.assignTime ?? '')
     const today = new Date()
-    console.log(taskDate.toDateString(), today.toDateString())
     return taskDate.toDateString() === today.toDateString()
   }).length
   const toDayCompletedTaskCount = completed.filter((task) => {
-    const taskDate = new Date(task.assignTime)
-    const today = new Date()
-    return taskDate.toDateString() === today.toDateString()
+    const taskDate = new Date(task.taskData.endTime ?? '').toLocaleDateString()
+    const today = new Date().toLocaleDateString()
+    return taskDate === today
   }).length
+
+  const averageTaskTime =
+    completed.length > 0
+      ? completed.reduce((acc, task) => {
+          // 確保 startTime 和 endTime 都存在
+          if (task.taskData.startTime && task.taskData.endTime) {
+            const taskTimeMs =
+              new Date(task.taskData.endTime).getTime() -
+              new Date(task.taskData.startTime).getTime()
+            // 轉換為分鐘
+            const taskTimeMinutes = taskTimeMs / (1000 * 60)
+            return acc + taskTimeMinutes
+          }
+          return acc
+        }, 0) / completed.filter((task) => task.taskData.startTime && task.taskData.endTime).length
+      : 0
+
   return {
     total: res.count,
     completed: completed.length,
     toDayNewTaskCount,
     toDayCompletedTaskCount,
+    averageTaskTime,
   }
 }

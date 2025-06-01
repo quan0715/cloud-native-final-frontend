@@ -19,28 +19,31 @@
     <div class="flex flex-col gap-2">
       <div v-for="m in machines" :key="m._id" class="flex flex-col gap-2">
         <div class="flex items-stretch gap-4 border-2 border-gray-200 p-4 rounded-xl">
-          <!-- 機器名稱 -->
-          <div class="flex-1 flex flex-col justify-start items-start gap-2">
-            <!-- 任務標題 -->
-            <div id="task-header" class="flex flex-col justify-start items-start gap-1.5">
-              <StatusBadge :label="m.status" :status="m.status" />
-              <p class="text-xl font-thin px-1">{{ m.machineName }}</p>
+          <!-- 機器資訊 -->
+          <div class="w-full flex flex-col justify-start items-start gap-2 p-2 rounded-lg">
+            <div id="task-header" class="flex flex-col justify-start items-start gap-1">
+              <StatusBadge :label="m.status" :status="m.status" class="w-fit" />
+              <p class="text-2xl font-thin px-1">{{ m.machineName }}</p>
             </div>
+
             <Separator orientation="horizontal" class="w-full" />
-            <div class="flex flex-row justify-start items-center gap-2">
-              <ColorBadge
-                v-for="type in m.machine_task_types"
-                :key="type._id"
-                :label="type.taskName"
-                :primaryColor="type.color ?? '#EA4B44'"
-                class="text-sm p-0"
-              />
+
+            <div class="w-full flex flex-col justify-start items-start gap-1">
+              <div class="flex flex-wrap gap-1">
+                <ColorBadge
+                  v-for="type in m.machine_task_types"
+                  :key="type._id"
+                  :label="type.taskName"
+                  :primaryColor="type.color ?? '#EA4B44'"
+                  class="text-sm p-0"
+                />
+              </div>
             </div>
           </div>
 
           <Separator orientation="vertical" class="h-auto" />
 
-          <!-- 編輯 / 刪除 -->
+          <!-- 編輯按鈕 -->
           <div class="flex items-center gap-2">
             <MachineFormDialog
               :taskTypes="taskTypes"
@@ -53,7 +56,6 @@
                 <Edit class="w-4 h-4" />
               </Button>
             </MachineFormDialog>
-            <!-- Edit Dialog -->
           </div>
         </div>
       </div>

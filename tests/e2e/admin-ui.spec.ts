@@ -23,7 +23,7 @@ test.describe('Admin UI Rendering', () => {
 
     await page.getByRole('tab', { name: '機器管理' }).click()
     await page.getByRole('button', { name: '新增機器' }).click()
-    await page.getByPlaceholder('機器名稱').fill('test-playwright')
+    await page.locator('//input[contains(@class, "h-9") and contains(@class, "w-full")]').first().fill('test-playwright');
     await page.getByRole('button', { name: '確定' }).click()
     await expect(page.getByText('test-playwright')).toBeVisible()
   })
@@ -34,9 +34,11 @@ test.describe('Admin UI Rendering', () => {
 
   await page.getByRole('tab', { name: '機器管理' }).click()
 
-  const card = page.locator('text=test-playwright').locator('xpath=ancestor::div[contains(@class, "border-2")]');
-  const deleteBtn = card.locator('button:has(svg.lucide-trash)');
+  const editButton = page.locator('//p[text()="test-playwright"]/ancestor::div[contains(@class, "flex")][1]//button[.//svg[contains(@class, "lucide-square-pen")]]');
+  await editButton.click();
 
+  const deleteBtn = page.getByRole('button', { name: '刪除' });
+  await expect(deleteBtn).toBeVisible();
   await deleteBtn.click();
 
   const confirmBtn = page.getByRole('button', { name: '確定' });

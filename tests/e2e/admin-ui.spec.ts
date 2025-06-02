@@ -25,7 +25,7 @@ test.describe('Admin UI Rendering', () => {
     await page.getByRole('button', { name: '新增機器' }).click()
     await page.locator('//input[contains(@class, "h-9") and contains(@class, "w-full")]').first().fill('test-playwright');
     await page.getByRole('button', { name: '確定' }).click()
-    
+
     const paragraph = page.locator('p.text-2xl.font-thin.px-1', { hasText: 'test-playwright' });
     await expect(paragraph).toBeVisible();
   })
@@ -34,16 +34,13 @@ test.describe('Admin UI Rendering', () => {
   await login(page, 'admin001', '123456')
   await expect(page).toHaveURL('/admin')
 
-  await page.getByRole('tab', { name: '機器管理' }).click()
+  await page.getByRole('tab', { name: '機器管理' }).click();
 
-  const cardEditButton = page.locator(`
-  //p[text()="test-playwright"]
-    /ancestor::div[contains(@class, "rounded-xl")][1]
-    //button[.//svg[contains(@class, "lucide-square-pen")]]
-` );
-
-  await cardEditButton.scrollIntoViewIfNeeded();
-  await cardEditButton.click();
+  const taskTitle = page.getByText('test-playwright');
+  const taskCard = taskTitle.locator('xpath=ancestor::div[contains(@class, "border")]');
+  const editBtn = taskCard.locator('button:has(svg.lucide-square-pen)');
+  await expect(editBtn).toBeVisible();
+  await editBtn.click();
 
   const deleteBtn = page.getByRole('button', { name: '刪除' });
   await expect(deleteBtn).toBeVisible();

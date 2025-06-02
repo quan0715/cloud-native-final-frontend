@@ -8,6 +8,5 @@ export const useUserData = () => {
   const username = decodedToken.userName
   const userId = decodedToken.id
   const userRole = decodedToken.role
-
   return { username, userId, userRole }
 }

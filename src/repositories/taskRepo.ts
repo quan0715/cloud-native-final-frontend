@@ -56,6 +56,14 @@ export async function getAllTasks(): Promise<Task[]> {
   return response.json()
 }
 
+export async function getTask(taskId: string): Promise<Task> {
+  const response = await fetch(`${taskEndPoint}/${taskId}`, {
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  return response.json()
+}
+
 export async function getDraftTasks(): Promise<Task[]> {
   const response = await fetch(`${taskEndPoint}/draft`, {
     headers: { 'Content-Type': 'application/json' },
@@ -196,4 +204,51 @@ export async function failToFinishTask(taskId: string) {
   })
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
   return response.json()
+}
+
+export async function getWorkerWeaklyReview(userId: string) {
+  const response = await fetch(`${taskEndPoint}/week-load/${userId}`, {
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  const res = (await response.json()) as {
+    count: number
+    tasks: Task[]
+  }
+  console.log(res)
+  const completed = res.tasks.filter((task) => task.taskData.state === 'success')
+  const toDayNewTaskCount = res.tasks.filter((task) => {
+    const taskDate = new Date(task.taskData.assignTime ?? '')
+    const today = new Date()
+    return taskDate.toDateString() === today.toDateString()
+  }).length
+  const toDayCompletedTaskCount = completed.filter((task) => {
+    const taskDate = new Date(task.taskData.endTime ?? '').toLocaleDateString()
+    const today = new Date().toLocaleDateString()
+    return taskDate === today
+  }).length
+
+  const averageTaskTime =
+    completed.length > 0
+      ? completed.reduce((acc, task) => {
+          // 確保 startTime 和 endTime 都存在
+          if (task.taskData.startTime && task.taskData.endTime) {
+            const taskTimeMs =
+              new Date(task.taskData.endTime).getTime() -
+              new Date(task.taskData.startTime).getTime()
+            // 轉換為分鐘
+            const taskTimeMinutes = taskTimeMs / (1000 * 60)
+            return acc + taskTimeMinutes
+          }
+          return acc
+        }, 0) / completed.filter((task) => task.taskData.startTime && task.taskData.endTime).length
+      : 0
+
+  return {
+    total: res.count,
+    completed: completed.length,
+    toDayNewTaskCount,
+    toDayCompletedTaskCount,
+    averageTaskTime,
+  }
 }

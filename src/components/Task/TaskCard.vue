@@ -1,28 +1,45 @@
 <template>
-  <Card class="flex justify-between items-center p-4 rounded-xl shadow-sm group">
+  <Card v-if="task" class="flex justify-between items-start p-4 rounded-xl shadow-sm group">
     <div class="w-full flex flex-col justify-start items-start gap-4">
       <!-- 任務標題 -->
       <div id="task-header" class="flex flex-col justify-start items-start gap-2">
         <StatusBadge :label="taskState.label" :status="taskState.status" />
 
         <div class="flex flex-row justify-start items-center gap-2">
-          <p class="text-xl font-thin">{{ task.taskName }}</p>
+          <p class="text-xl font-thin">{{ task.taskName ?? '未知' }}</p>
         </div>
       </div>
       <Separator orientation="horizontal" class="w-full" />
       <div class="w-full flex flex-col justify-start items-start gap-2">
         <ColorBadge
+          v-if="task.taskTypeId"
           :label="task.taskTypeId.taskName"
-          :primaryColor="task.taskTypeId.color || '#3B82F6'"
+          :primaryColor="task.taskTypeId.color ?? '#3B82F6'"
           class="text-sm"
         />
-        <p class="text-sm text-gray-500">
-          <span v-if="task.taskData.state === 'assigned'">
-            已指派給 - {{ task.taskData.assignee_id?.userName || '未知' }}
+        <p
+          class="text-sm text-gray-500 font-mono"
+          v-if="task.taskData.assignTime && task.taskData.state === 'assigned'"
+        >
+          {{ `指派時間: ${formatDate(task.taskData.assignTime)}` }}
+        </p>
+        <p
+          class="text-sm text-gray-500 font-mono"
+          v-if="task.taskTypeId?.number_of_machine && task.taskData.state === 'assigned'"
+        >
+          {{ `機器測試需求: ${task.taskTypeId?.number_of_machine}台` }}
+        </p>
+        <p class="text-sm text-gray-500 font-mono">
+          <span v-if="task.taskData.state === 'assigned' && task.taskData.assignee_id?.userName">
+            已指派給 - {{ task.taskData.assignee_id.userName }}
           </span>
-          <span v-if="task.taskData.state === 'in-progress'">
-            {{ task.taskData.assignee_id?.userName || '未知' }} 正在操作
-            {{ (task.taskData.machine ?? []).map((machine) => machine.machineName).join(' | ') }}
+          <span v-if="task.taskData.state === 'in-progress' && task.taskData.assignee_id?.userName">
+            {{ task.taskData.assignee_id.userName }} 正在操作
+            {{
+              (task.taskData.machine || [])
+                .map((machine) => machine?.machineName || '未知機器')
+                .join(' | ')
+            }}
           </span>
           <span v-if="task.taskData.state === 'success'">
             {{ task.taskData.assignee_id?.userName || '未知' }} 完成任務
@@ -61,9 +78,17 @@ import { Separator } from '@/components/ui/separator'
 const { task } = defineProps<{
   task: Task
 }>()
-
 console.log('task', task)
-
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+}
 const taskState = computed(() => {
   switch (task.taskData.state) {
     case 'draft':

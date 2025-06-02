@@ -137,10 +137,12 @@ const isAutoAssignDrawerOpen = ref(false)
 const { userId } = useUserData()
 
 const draftTask = computed(() => {
+  if (!tasks.value) return []
   return tasks.value.filter((t: Task) => t.taskData.state === 'draft')
 })
 
 const uncompletedTask = computed(() => {
+  if (!tasks.value) return []
   return tasks.value.filter(
     (t: Task) =>
       t.taskData.state != 'draft' && t.taskData.state != 'success' && t.taskData.state != 'fail',

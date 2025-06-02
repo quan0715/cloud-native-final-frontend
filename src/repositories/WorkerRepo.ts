@@ -17,9 +17,9 @@ export async function fetchWorkers(): Promise<UserWithTasks[]> {
   }
 }
 
-export async function fetchWorker(username: string): Promise<UserWithTasks> {
+export async function fetchWorker(userId: string): Promise<UserWithTasks> {
   try {
-    const res = await fetch(`${userEndPoint}/${username}/with-tasks`, {
+    const res = await fetch(`${userEndPoint}/with-tasks/${userId}`, {
       headers,
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)

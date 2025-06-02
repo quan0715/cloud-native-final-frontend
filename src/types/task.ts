@@ -5,8 +5,8 @@ export interface TaskType {
   taskName: string // 顯示名稱
   number_of_machine: number // 需要幾台機器
   color?: string // 任務類型顏色
-  createdAt: ISODate
-  updatedAt: ISODate
+  createdAt?: ISODate
+  updatedAt?: ISODate
   __v?: number // Mongoose 版本號，可忽略
 }
 

@@ -1,7 +1,7 @@
 import MainLayout from '@/layouts/MainLayout.vue'
 import DashboardView from '@/views/Dashboard/index.vue'
-import Task from '@/views/Task/Task.vue'
-import Admin from '@/views/Admin/Admin.vue'
+import Admin from '@/views/Admin/index.vue'
+import Task from '@/views/Task/index.vue'
 import LoginView from '@/views/LoginView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { jwtDecode } from 'jwt-decode'
@@ -72,8 +72,6 @@ export function getUserDefaultRoute(userRole: string) {
 }
 
 router.beforeEach((to, from, next) => {
-  console.log('to', to)
-  console.log('from', from)
   const token = localStorage.getItem('token')
   const isLoginRoute = to.path === '/login'
 

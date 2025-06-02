@@ -65,11 +65,32 @@ jobs:
           key: ${{ secrets.ec2_ssh_key }}
           script: |
             set -e
-            echo "👉 拉${{ inputs.tag }}映像"
-            sudo docker compose pull
-            echo "👉 重啟服務（不中斷）"
-            sudo docker compose up -d --remove-orphans
-            echo "🔄 Pruning Docker images"
+            echo "🔑 Logged in as $(whoami) on host $(hostname)"
+      
+            # Navigate to your app directory (adjust path as needed)
+            cd ~/app || { echo "❌ App directory not found"; exit 1; }
+            echo "${{ secrets.GITHUB_TOKEN }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Verify configuration files are synced
+            echo "📁 Verifying configuration files"
+            echo "🔎 Verifying synced configuration files:"
+            ls -la docker-compose.yml
+            ls -la observability/
+            ls -la nginx/nginx.conf
+            sudo docker compose down
+            echo "🚀 Bringing services up with Docker Compose (will pull new images as needed)"
+            sudo docker compose up --pull always -d --remove-orphans
+
+            echo "🧹 Pruning old Docker images to free up space"
             sudo docker image prune -af
-            echo "👉 重啟 cloudflared，讓新容器立即被代理"
-            sudo systemctl restart cloudflared
+
+            if sudo systemctl status cloudflared &> /dev/null; then
+              echo "🔄 Restarting cloudflared service"
+              sudo systemctl restart cloudflared
+            else
+              echo "ℹ️ cloudflared service not found or not active, skipping restart."
+            fi
+
+            echo "📊 Final deployment status:"
+            sudo docker compose ps
+
+            echo "✅ Deployment to EC2 completed successfully!"

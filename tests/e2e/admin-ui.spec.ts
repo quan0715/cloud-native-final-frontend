@@ -25,7 +25,9 @@ test.describe('Admin UI Rendering', () => {
     await page.getByRole('button', { name: '新增機器' }).click()
     await page.locator('//input[contains(@class, "h-9") and contains(@class, "w-full")]').first().fill('test-playwright');
     await page.getByRole('button', { name: '確定' }).click()
-    await expect(page.getByText('test-playwright')).toBeVisible()
+    const machineCard = page.getByText('test-playwright');
+    await machineCard.scrollIntoViewIfNeeded();
+    await expect(machineCard).toBeVisible();
   })
 
   test('deletes the machine named "test-playwright"', async ({ page }) => {
@@ -34,8 +36,14 @@ test.describe('Admin UI Rendering', () => {
 
   await page.getByRole('tab', { name: '機器管理' }).click()
 
-  const editButton = page.locator('//p[text()="test-playwright"]/ancestor::div[contains(@class, "flex")][1]//button[.//svg[contains(@class, "lucide-square-pen")]]');
-  await editButton.click();
+  const cardEditButton = page.locator(`
+  //p[text()="test-playwright"]
+    /ancestor::div[contains(@class, "rounded-xl")][1]
+    //button[.//svg[contains(@class, "lucide-square-pen")]]
+` );
+
+  await cardEditButton.scrollIntoViewIfNeeded();
+  await cardEditButton.click();
 
   const deleteBtn = page.getByRole('button', { name: '刪除' });
   await expect(deleteBtn).toBeVisible();

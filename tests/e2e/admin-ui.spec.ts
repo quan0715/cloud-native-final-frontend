@@ -25,9 +25,9 @@ test.describe('Admin UI Rendering', () => {
     await page.getByRole('button', { name: '新增機器' }).click()
     await page.locator('//input[contains(@class, "h-9") and contains(@class, "w-full")]').first().fill('test-playwright');
     await page.getByRole('button', { name: '確定' }).click()
-    const machineCard = page.getByText('test-playwright');
-    await machineCard.scrollIntoViewIfNeeded();
-    await expect(machineCard).toBeVisible();
+    
+    const paragraph = page.locator('p.text-2xl.font-thin.px-1', { hasText: 'test-playwright' });
+    await expect(paragraph).toBeVisible();
   })
 
   test('deletes the machine named "test-playwright"', async ({ page }) => {

@@ -29,7 +29,7 @@
         >
           {{ `機器測試需求: ${task.taskTypeId?.number_of_machine}台` }}
         </p>
-        <p class="text-sm text-gray-500 font-mono">
+        <p class="text-sm text-gray-500 font-mono flex flex-col justify-start items-start gap-1">
           <span v-if="task.taskData.state === 'assigned' && task.taskData.assignee_id?.userName">
             已指派給 - {{ task.taskData.assignee_id.userName }}
           </span>
@@ -44,8 +44,14 @@
           <span v-if="task.taskData.state === 'success'">
             {{ task.taskData.assignee_id?.userName || '未知' }} 完成任務
           </span>
+          <span v-if="task.taskData.state === 'success' && task.taskData.endTime">
+            {{ `${formatDate(task.taskData.endTime)} 完成` }}
+          </span>
           <span v-if="task.taskData.state === 'fail'">
             {{ task.taskData.assignee_id?.userName || '未知' }} 已放棄任務
+          </span>
+          <span v-if="task.taskData.state === 'fail' && task.taskData.endTime">
+            {{ `${formatDate(task.taskData.endTime)} 放棄` }}
           </span>
         </p>
       </div>

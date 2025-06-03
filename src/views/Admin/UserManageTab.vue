@@ -1,21 +1,5 @@
 <template>
   <DashboardCard title="實驗室人員管理" class="w-full">
-    <template #action>
-      <UserFormDialog
-        :task-types="taskTypes"
-        @create="handleCreateEvent"
-        @update="handleUpdateEvent"
-        @delete="handleDeleteEvent"
-      >
-        <Button variant="outline">
-          <div class="flex items-center gap-2">
-            <Plus class="w-4 h-4" />
-            新增使用者
-          </div>
-        </Button>
-      </UserFormDialog>
-    </template>
-
     <div class="flex flex-col gap-2">
       <div v-for="u in users" :key="u._id" class="flex flex-col gap-2">
         <div class="flex items-stretch gap-4 border-2 border-gray-200 p-4 rounded-xl">

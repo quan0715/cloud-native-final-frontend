@@ -7,23 +7,64 @@
         </h1>
       </div>
       <TaskSummaryCard
-        :total="totalTasks"
-        :draft="draftCount"
-        :inProgress="uncompletedTaskCount"
+        title="測試總覽"
+        :data="[
+          { label: '總測試數', value: totalTasks },
+          { label: '等待指派', value: draftCount },
+          { label: '未結單', value: uncompletedTaskCount },
+        ]"
+        class="w-full h-fit"
+      />
+      <TaskSummaryCard
+        title="工人總覽"
+        :data="[
+          { label: '總工人數', value: workers.length },
+          {
+            label: '閒置工人',
+            value: workers.filter(
+              (w) => w.assignedTasks.length === 0 && w.inProgressTasks.length === 0,
+            ).length,
+          },
+          {
+            label: '忙碌工人',
+            value: workers.filter((w) => w.assignedTasks.length > 0 || w.inProgressTasks.length > 0)
+              .length,
+          },
+        ]"
+        class="w-full h-fit"
+      />
+      <TaskSummaryCard
+        title="機器總覽"
+        :data="[
+          { label: '總機器數', value: machines.length },
+          {
+            label: '閒置機器',
+            value: machines.filter((m) => m.status === 'idle').length,
+          },
+          {
+            label: '忙碌機器',
+            value: machines.filter((m) => m.status !== 'idle').length,
+          },
+        ]"
         class="w-full h-fit"
       />
       <Separator orientation="horizontal" />
-      <div class="w-full flex flex-row justify-between items-center gap-2">
+      <div
+        class="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-2"
+      >
         <h1 class="w-fit text-3xl font-thin">任務草稿佇列</h1>
         <div class="flex flex-row justify-end items-center gap-2">
-          <Button variant="outline" @click="openNewTaskDialog">
+          <Button variant="outline" @click="openNewTaskDialog" class="w-fit h-10 rounded-md">
             <Plus class="w-4 h-4" />
             新增任務
           </Button>
-          <Button @click="openAutoAssignDrawer"> 自動指派 </Button>
+          <Button @click="openAutoAssignDrawer" class="w-fit h-10 rounded-md">
+            <Bot class="w-4 h-4" />
+            自動指派
+          </Button>
         </div>
       </div>
-      <div class="w-full grid grid-cols-3 gap-4 h-full">
+      <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
         <DraftTask
           v-for="task in draftTask"
           :key="task._id"
@@ -35,7 +76,7 @@
       <div class="w-full flex flex-row justify-between items-center gap-2">
         <h1 class="w-fit text-3xl font-thin">未結單任務</h1>
       </div>
-      <div class="w-full grid grid-cols-3 gap-4 h-full">
+      <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
         <TaskCard
           v-for="task in uncompletedTask"
           :key="task._id"
@@ -45,7 +86,7 @@
       </div>
       <Separator orientation="horizontal" />
       <h1 class="w-fit text-3xl font-thin">機器</h1>
-      <div class="w-full grid grid-cols-3 gap-4 h-full">
+      <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
         <MachinePreviewCard
           v-for="machine in machines"
           :key="machine._id"
@@ -55,7 +96,7 @@
       </div>
       <Separator orientation="horizontal" />
       <h1 class="w-fit text-3xl font-thin">人員</h1>
-      <div class="w-full grid grid-cols-3 gap-4 h-full">
+      <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
         <WorkerPreviewCard
           v-for="worker in workers"
           :key="worker._id"
@@ -67,9 +108,15 @@
       <div class="w-full flex flex-row justify-between items-center gap-2">
         <h1 class="w-fit text-3xl font-thin">已完成任務</h1>
       </div>
-      <div class="w-full grid grid-cols-3 gap-4 h-full">
+      <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
         <TaskCard
-          v-for="task in tasks.filter((t: Task) => t.taskData.state === 'success')"
+          v-for="task in tasks
+            .filter((t: Task) => t.taskData.state === 'success')
+            .sort((a, b) => {
+              const aDate = a.taskData.endTime ? new Date(a.taskData.endTime) : new Date()
+              const bDate = b.taskData.endTime ? new Date(b.taskData.endTime) : new Date()
+              return bDate.getTime() - aDate.getTime()
+            })"
           :key="task._id"
           :task="task"
           class="w-full h-auto flex-1"
@@ -79,9 +126,15 @@
       <div class="w-full flex flex-row justify-between items-center gap-2">
         <h1 class="w-fit text-3xl font-thin">已放棄任務</h1>
       </div>
-      <div class="w-full grid grid-cols-3 gap-4 h-full">
+      <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
         <TaskCard
-          v-for="task in tasks.filter((t: Task) => t.taskData.state === 'fail')"
+          v-for="task in tasks
+            .filter((t: Task) => t.taskData.state === 'fail')
+            .sort((a, b) => {
+              const aDate = a.taskData.endTime ? new Date(a.taskData.endTime) : new Date()
+              const bDate = b.taskData.endTime ? new Date(b.taskData.endTime) : new Date()
+              return bDate.getTime() - aDate.getTime()
+            })"
           :key="task._id"
           :task="task"
           class="w-full h-auto flex-1"
@@ -126,7 +179,7 @@ import { useUserData } from '@/composables/useUserData'
 import { getAllTasks as getAllTasksFromRepo } from '@/repositories/taskRepo'
 import { fetchMachines as fetchMachinesFromRepo } from '@/repositories/MachineRepo'
 import { fetchWorkers as fetchWorkersFromRepo } from '@/repositories/WorkerRepo'
-
+import { Bot } from 'lucide-vue-next'
 const machines = ref<Machine[]>([])
 const workers = ref<UserWithTasks[]>([])
 const loading = inject<Ref<boolean>>('globalLoading')!

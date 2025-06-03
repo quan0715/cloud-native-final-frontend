@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-col justify-center items-center p-12">
+  <div class="flex flex-col justify-center items-center p-4 md:p-12">
     <div class="max-w-5xl w-full flex flex-col justify-start items-start gap-4">
       <h1 class="w-fit text-3xl font-thin">
         <span class="text-blue-600">LAB 11</span> / {{ username }} 歡迎回來
       </h1>
-      <div class="w-full grid grid-cols-3 gap-4">
+      <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
         <UserWeaklyReview
           class="col-span-1"
           :total="workerWeaklyReview?.total ?? 0"
@@ -14,7 +14,7 @@
           :averageTaskTime="workerWeaklyReview?.averageTaskTime ?? 0"
         />
         <InprogressTaskCard
-          class="col-span-2"
+          class="col-span-1 md:col-span-2"
           :inprogress-task="inProgressTask ?? null"
           @taskStarted="fetchWorker"
           @taskCompleted="fetchWorker"

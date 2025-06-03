@@ -23,7 +23,8 @@ test.describe('Leader UI Rendering', () => {
 
       await page.getByRole('button', { name: '新增任務' }).click()
       await page.getByRole('combobox').click();
-      await page.getByRole('option', { name: '電性測試' }).click();
+      const firstOption = page.locator('[role="option"]').first();
+      await firstOption.click();
       await page.getByPlaceholder('輸入任務名稱').fill('test-playwright')
       await page.getByRole('button', { name: '確定' }).click()
       await page.waitForTimeout(1000); 

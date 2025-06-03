@@ -23,27 +23,34 @@ test.describe('Admin UI Rendering', () => {
 
     await page.getByRole('tab', { name: '機器管理' }).click()
     await page.getByRole('button', { name: '新增機器' }).click()
-    await page.getByPlaceholder('機器名稱').fill('test-playwright')
+    await page.locator('//input[contains(@class, "h-9") and contains(@class, "w-full")]').first().fill('test-playwright');
     await page.getByRole('button', { name: '確定' }).click()
-    await expect(page.getByText('test-playwright')).toBeVisible()
+
+    const paragraph = page.locator('p.text-2xl.font-thin.px-1', { hasText: 'test-playwright' });
+    await expect(paragraph).toBeVisible();
   })
 
   test('deletes the machine named "test-playwright"', async ({ page }) => {
   await login(page, 'admin001', '123456')
   await expect(page).toHaveURL('/admin')
 
-  await page.getByRole('tab', { name: '機器管理' }).click()
+  await page.getByRole('tab', { name: '機器管理' }).click();
 
-  const card = page.locator('text=test-playwright').locator('xpath=ancestor::div[contains(@class, "border-2")]');
-  const deleteBtn = card.locator('button:has(svg.lucide-trash)');
+  const taskTitle = page.getByText('test-playwright');
+  const taskCard = taskTitle.locator('xpath=ancestor::div[contains(@class, "border")]');
+  const editBtn = taskCard.locator('button:has(svg.lucide-square-pen)');
+  await expect(editBtn).toBeVisible();
+  await editBtn.click();
 
+  const deleteBtn = page.getByRole('button', { name: '刪除' });
+  await expect(deleteBtn).toBeVisible();
   await deleteBtn.click();
 
   const confirmBtn = page.getByRole('button', { name: '確定' });
   await expect(confirmBtn).toBeVisible();
   await confirmBtn.click();
 
-  await expect(page.getByText('test-playwright')).not.toBeVisible();
+  await expect(page.getByText('test-playwright', { exact: true })).toHaveCount(0);  
   })
 
   test('adds a new task type named "test-playwright"', async ({page}) => {
@@ -53,8 +60,6 @@ test.describe('Admin UI Rendering', () => {
     await page.getByRole('tab', { name: '任務類型管理' }).click()
     await page.getByRole('button', { name: '新增任務類型' }).click()
     await page.getByPlaceholder('如：電性測試').fill('test-playwright')
-    const numberInput = page.locator('input[type="number"]');
-    await numberInput.fill('1');
     await page.getByRole('button', { name: '確定' }).click()
     await expect(page.getByText('test-playwright')).toBeVisible()
   })
@@ -65,15 +70,20 @@ test.describe('Admin UI Rendering', () => {
   
   await page.getByRole('tab', { name: '任務類型管理' }).click()
 
-  const card = page.locator('text=test-playwright').locator('xpath=ancestor::div[contains(@class, "border-2")]');
-  const deleteBtn = card.locator('button:has(svg.lucide-trash)');
+  const taskTitle = page.getByText('test-playwright');
+  const taskCard = taskTitle.locator('xpath=ancestor::div[contains(@class, "border")]');
+  const editBtn = taskCard.locator('button:has(svg.lucide-square-pen)');
+  await expect(editBtn).toBeVisible();
+  await editBtn.click();
 
+  const deleteBtn = page.getByRole('button', { name: '刪除' });
+  await expect(deleteBtn).toBeVisible();
   await deleteBtn.click();
 
   const confirmBtn = page.getByRole('button', { name: '確定' });
   await expect(confirmBtn).toBeVisible();
   await confirmBtn.click();
 
-  await expect(page.getByText('test-playwright')).not.toBeVisible();
+  await expect(page.getByText('test-playwright', { exact: true })).toHaveCount(0);  
   })
 })
